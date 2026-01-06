@@ -1,0 +1,321 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+Oriya:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Primary - Deep Forest Green (Agriculture/Nature) */
+    --primary-50: #f0fdf4;
+    --primary-100: #dcfce7;
+    --primary-200: #bbf7d0;
+    --primary-300: #86efac;
+    --primary-400: #4ade80;
+    --primary-500: #22c55e;
+    --primary-600: #16a34a;
+    --primary-700: #15803d;
+    --primary-800: #166534;
+    --primary-900: #14532d;
+    
+    /* Secondary - Warm Terracotta (Earth/Livestock) */
+    --secondary-50: #fdf4f3;
+    --secondary-100: #fce8e6;
+    --secondary-200: #fad5d1;
+    --secondary-300: #f5b5ad;
+    --secondary-400: #ed8a7c;
+    --secondary-500: #e16652;
+    --secondary-600: #cd4936;
+    --secondary-700: #ac3b2a;
+    
+    /* Accent - Golden Amber (Prosperity/Harvest) */
+    --accent-50: #fffbeb;
+    --accent-100: #fef3c7;
+    --accent-200: #fde68a;
+    --accent-300: #fcd34d;
+    --accent-400: #fbbf24;
+    --accent-500: #f59e0b;
+    --accent-600: #d97706;
+    
+    /* Neutrals - Warm Slate */
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --slate-900: #0f172a;
+    
+    /* Status Colors */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #fef3c7 100%);
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', system-ui, sans-serif;
+  }
+
+  .font-odia {
+    font-family: 'Noto Sans Oriya', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Enhanced Scrollbar Styling */
+  /* For Webkit browsers (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(241, 245, 249, 0.5);
+    border-radius: 10px;
+    margin: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(4px);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(135deg, #14532d 0%, #15803d 100%);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: rgba(241, 245, 249, 0.5);
+    border-radius: 10px;
+  }
+
+  /* For Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #16a34a rgba(241, 245, 249, 0.5);
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+
+  .glass-card-darker {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .bg-mesh {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #fef3c7 100%);
+  }
+
+  .card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .button-press:active {
+    transform: scale(0.98);
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Custom Scrollbar for Modals and Cards */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(226, 232, 240, 0.3);
+    border-radius: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    border-radius: 8px;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  }
+
+  /* Thin Scrollbar Variant */
+  .thin-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(22, 163, 74, 0.6);
+    border-radius: 6px;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(22, 163, 74, 0.9);
+  }
+
+  /* Light Scrollbar for White Backgrounds */
+  .light-scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .light-scrollbar::-webkit-scrollbar-track {
+    background: rgba(248, 250, 252, 0.8);
+    border-radius: 10px;
+    border: 1px solid rgba(226, 232, 240, 0.4);
+  }
+
+  .light-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .light-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #bbf7d0 0%, #86efac 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Dark Scrollbar for Dark Backgrounds */
+  .dark-scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .dark-scrollbar::-webkit-scrollbar-track {
+    background: rgba(51, 65, 85, 0.2);
+    border-radius: 10px;
+  }
+
+  .dark-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .dark-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  /* Hide Scrollbar (but keep functionality) */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Animated Scrollbar */
+  @keyframes scrollbarPulse {
+    0%, 100% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .animated-scrollbar::-webkit-scrollbar-thumb {
+    animation: scrollbarPulse 2s ease-in-out infinite;
+  }
+
+  /* Glass Scrollbar for Modal Overlays */
+  .glass-scrollbar::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .glass-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
+    border-radius: 10px;
+  }
+
+  .glass-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(22, 163, 74, 0.7);
+    backdrop-filter: blur(8px);
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(22, 163, 74, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+}
