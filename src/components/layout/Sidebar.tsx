@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   Home, 
   Users, 
@@ -14,9 +14,25 @@ import {
   BarChart3, 
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Map,
+  AlertTriangle,
+  ArrowRightLeft,
+  ClipboardList,
+  FlaskConical,
+  Sparkles,
+  Warehouse,
+  Barcode,
+  Bot,
+  Camera,
+  CloudOff,
+  Package,
+  Route,
+  Truck
 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { ROLE_MENU_ACCESS } from '../../data/mockUsers';
 
 interface NavItem {
   icon: React.ReactNode;
@@ -37,9 +53,49 @@ interface SidebarProps {
 export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNavigate }: SidebarProps) {
   const [activeItem, setActiveItem] = useState(currentPage);
   const { t, language } = useLanguage();
+  const { user } = useAuth();
+  const allowedPaths = user ? ROLE_MENU_ACCESS[user.role] : [];
+
+  useEffect(() => {
+    setActiveItem(currentPage);
+  }, [currentPage]);
   
   const navItems: NavItem[] = [
     { icon: <Home size={20} />, labelEn: 'Dashboard', labelHi: 'डैशबोर्ड', labelOd: 'ଡ୍ୟାସବୋର୍ଡ', path: 'dashboard', active: true },
+    { icon: <Map size={20} />, labelEn: 'Semen Dashboard', labelHi: 'Semen Dashboard', labelOd: 'Semen Dashboard', path: 'semen-dashboard' },
+    { icon: <Warehouse size={20} />, labelEn: 'District Drilldown', labelHi: 'District Drilldown', labelOd: 'District Drilldown', path: 'semen-drilldown' },
+    { icon: <Syringe size={20} />, labelEn: 'Semen Allocation', labelHi: 'Semen Allocation', labelOd: 'Semen Allocation', path: 'semen-allocation' },
+    { icon: <ArrowRightLeft size={20} />, labelEn: 'Redistribution', labelHi: 'Redistribution', labelOd: 'Redistribution', path: 'semen-redistribution' },
+    { icon: <ClipboardList size={20} />, labelEn: 'Restocking Requests', labelHi: 'Restocking Requests', labelOd: 'Restocking Requests', path: 'semen-requests' },
+    { icon: <BarChart3 size={20} />, labelEn: 'Semen Reports', labelHi: 'Semen Reports', labelOd: 'Semen Reports', path: 'semen-reports' },
+    { icon: <Sparkles size={20} />, labelEn: 'AI Forecasting', labelHi: 'AI Forecasting', labelOd: 'AI Forecasting', path: 'semen-forecasting' },
+    { icon: <FlaskConical size={20} />, labelEn: 'CDVO Semen', labelHi: 'CDVO Semen', labelOd: 'CDVO Semen', path: 'cdvo-semen' },
+    { icon: <FlaskConical size={20} />, labelEn: 'SDVO Semen', labelHi: 'SDVO Semen', labelOd: 'SDVO Semen', path: 'sdvo-semen' },
+    { icon: <Package size={20} />, labelEn: 'LAC Medicine Home', labelHi: 'LAC Medicine Home', labelOd: 'LAC Medicine Home', path: 'lac-medicine-home' },
+    { icon: <Syringe size={20} />, labelEn: 'Log Medicine', labelHi: 'Log Medicine', labelOd: 'Log Medicine', path: 'lac-medicine-log' },
+    { icon: <Users size={20} />, labelEn: 'Farmer Profile', labelHi: 'Farmer Profile', labelOd: 'Farmer Profile', path: 'lac-medicine-farmer' },
+    { icon: <Barcode size={20} />, labelEn: 'Barcode Receipt', labelHi: 'Barcode Receipt', labelOd: 'Barcode Receipt', path: 'lac-medicine-barcode' },
+    { icon: <ClipboardList size={20} />, labelEn: 'Medicine Request', labelHi: 'Medicine Request', labelOd: 'Medicine Request', path: 'lac-medicine-request' },
+    { icon: <Warehouse size={20} />, labelEn: 'Medicine Inventory', labelHi: 'Medicine Inventory', labelOd: 'Medicine Inventory', path: 'lac-medicine-inventory' },
+    { icon: <CloudOff size={20} />, labelEn: 'Offline Mode', labelHi: 'Offline Mode', labelOd: 'Offline Mode', path: 'lac-medicine-offline' },
+    { icon: <Package size={20} />, labelEn: 'Farmer Medicine Login', labelHi: 'Farmer Medicine Login', labelOd: 'Farmer Medicine Login', path: 'farmer-medicine-login' },
+    { icon: <Syringe size={20} />, labelEn: 'Medicine Service', labelHi: 'Medicine Service', labelOd: 'Medicine Service', path: 'farmer-medicine-request' },
+    { icon: <ClipboardList size={20} />, labelEn: 'Medicine History', labelHi: 'Medicine History', labelOd: 'Medicine History', path: 'farmer-medicine-history' },
+    { icon: <Bot size={20} />, labelEn: 'Medicine Chatbot', labelHi: 'Medicine Chatbot', labelOd: 'Medicine Chatbot', path: 'farmer-medicine-chatbot' },
+    { icon: <AlertTriangle size={20} />, labelEn: 'BVO Medicine Queue', labelHi: 'BVO Medicine Queue', labelOd: 'BVO Medicine Queue', path: 'bvo-medicine-queue' },
+    { icon: <Truck size={20} />, labelEn: 'MVU Command', labelHi: 'MVU Command', labelOd: 'MVU Command', path: 'mvu-command' },
+    { icon: <ClipboardList size={20} />, labelEn: 'MVU Compliance', labelHi: 'MVU Compliance', labelOd: 'MVU Compliance', path: 'mvu-compliance' },
+    { icon: <Route size={20} />, labelEn: 'Fleet Edge', labelHi: 'Fleet Edge', labelOd: 'Fleet Edge', path: 'mvu-fleet' },
+    { icon: <Users size={20} />, labelEn: 'MVU Manpower', labelHi: 'MVU Manpower', labelOd: 'MVU Manpower', path: 'mvu-manpower' },
+    { icon: <BarChart3 size={20} />, labelEn: 'MVU Targets', labelHi: 'MVU Targets', labelOd: 'MVU Targets', path: 'mvu-targets' },
+    { icon: <Truck size={20} />, labelEn: 'CDVO MVU', labelHi: 'CDVO MVU', labelOd: 'CDVO MVU', path: 'cdvo-mvu' },
+    { icon: <Route size={20} />, labelEn: 'BVO Tour Plan', labelHi: 'BVO Tour Plan', labelOd: 'BVO Tour Plan', path: 'bvo-mvu-plan' },
+    { icon: <Package size={20} />, labelEn: 'BVO MVU Inventory', labelHi: 'BVO MVU Inventory', labelOd: 'BVO MVU Inventory', path: 'bvo-mvu-inventory' },
+    { icon: <ClipboardList size={20} />, labelEn: 'Village Assignment', labelHi: 'Village Assignment', labelOd: 'Village Assignment', path: 'bvo-mvu-assignment' },
+    { icon: <Truck size={20} />, labelEn: 'MVU Team Home', labelHi: 'MVU Team Home', labelOd: 'MVU Team Home', path: 'mvu-team-home' },
+    { icon: <Camera size={20} />, labelEn: 'Village Visit Log', labelHi: 'Village Visit Log', labelOd: 'Village Visit Log', path: 'mvu-team-visit' },
+    { icon: <ClipboardList size={20} />, labelEn: 'Daily Service Form', labelHi: 'Daily Service Form', labelOd: 'Daily Service Form', path: 'mvu-team-daily' },
+    { icon: <Package size={20} />, labelEn: 'MVU Stock Update', labelHi: 'MVU Stock Update', labelOd: 'MVU Stock Update', path: 'mvu-team-stock' },
     { icon: <Users size={20} />, labelEn: 'Farmers', labelHi: 'किसान', labelOd: 'କୃଷକ', path: 'farmers' },
     { icon: <Beef size={20} />, labelEn: 'Livestock', labelHi: 'पशुधन', labelOd: 'ପଶୁଧନ', path: 'livestock' },
     { icon: <Syringe size={20} />, labelEn: 'Health & Vaccination', labelHi: 'स्वास्थ्य और टीकाकरण', labelOd: 'ସ୍ୱାସ୍ଥ୍ୟ ଏବଂ ଟିକାକରଣ', path: 'health' },
@@ -107,7 +163,7 @@ export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNa
 
       {/* Navigation */}
       <nav className="p-4 space-y-1 overflow-y-auto h-[calc(100vh-100px)]">
-        {navItems.map((item) => (
+        {navItems.filter((item) => allowedPaths.includes(item.path)).map((item) => (
           <button
             key={item.path}
             onClick={() => handleNavClick(item.path)}

@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Plus, Search, Filter, Download, MapPin, Users } from 'lucide-react';
+import { Plus, Search, Filter, Download, MapPin, Users, LayoutGrid, List } from 'lucide-react';
 import { FarmerCard } from '../components/farmers/FarmerCard';
 import { FarmerDetail } from '../components/farmers/FarmerDetail';
 import { farmersData } from '../data/farmersData';
 import { useLanguage } from '../contexts/LanguageContext';
 
 type ViewMode = 'list' | 'detail';
+type DisplayMode = 'grid' | 'list';
 
 export default function FarmersManagement() {
   const { t } = useLanguage();
   const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('grid');
   const [selectedFarmer, setSelectedFarmer] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBlock, setSelectedBlock] = useState('all');
@@ -119,10 +121,34 @@ export default function FarmersManagement() {
             </button>
           </div>
 
-          <p className="text-sm text-slate-600">
-            {t('Showing', 'दिखा रहा है', 'ଦେଖାଯାଉଛି')} <span className="font-mono text-slate-900">{filteredFarmers.length}</span> {t('of', 'का', 'ର')}{' '}
-            <span className="font-mono text-slate-900">{farmers.length}</span> {t('farmers', 'किसान', 'କୃଷକ')}
-          </p>
+          <div className="flex items-center gap-3">
+            {/* List / Grid toggle */}
+            <div className="flex items-center bg-white/70 border border-white/30 rounded-xl p-1 gap-1">
+              <button
+                onClick={() => setDisplayMode('grid')}
+                className={`p-1.5 rounded-lg transition-all ${
+                  displayMode === 'grid' ? 'bg-green-600 text-white shadow' : 'text-slate-500 hover:text-slate-700'
+                }`}
+                title="Grid view"
+              >
+                <LayoutGrid size={15} />
+              </button>
+              <button
+                onClick={() => setDisplayMode('list')}
+                className={`p-1.5 rounded-lg transition-all ${
+                  displayMode === 'list' ? 'bg-green-600 text-white shadow' : 'text-slate-500 hover:text-slate-700'
+                }`}
+                title="List view"
+              >
+                <List size={15} />
+              </button>
+            </div>
+
+            <p className="text-sm text-slate-600">
+              {t('Showing', 'दिखा रहा है', 'ଦେଖାଯାଉଛି')} <span className="font-mono text-slate-900">{filteredFarmers.length}</span> {t('of', 'का', 'ର')}{' '}
+              <span className="font-mono text-slate-900">{farmers.length}</span> {t('farmers', 'किसान', 'କୃଷକ')}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -171,27 +197,69 @@ export default function FarmersManagement() {
         </div>
       </div>
 
-      {/* Farmers Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredFarmers.map((farmer) => (
-          <FarmerCard
-            key={farmer.id}
-            id={farmer.id}
-            farmerId={farmer.farmerId}
-            name={farmer.name}
-            nameOdia={farmer.nameOdia}
-            contact={farmer.contact}
-            village={farmer.address.village}
-            block={farmer.address.block}
-            totalLivestock={farmer.totalLivestock}
-            livestock={farmer.livestock}
-            kycStatus={farmer.kycStatus}
-            insuranceStatus={farmer.insuranceStatus}
-            schemes={farmer.schemes}
-            onClick={() => handleFarmerClick(farmer)}
-          />
-        ))}
-      </div>
+      {/* Farmers List/Grid */}
+      {displayMode === 'list' ? (
+        <div className="glass-card-darker rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50/80 border-b border-slate-200">
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Farmer</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Location</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Contact</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Livestock</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">KYC</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Insurance</th>
+                  <th className="px-4 py-2.5" />
+                </tr>
+              </thead>
+              <tbody className="bg-white/40">
+                {filteredFarmers.map((farmer) => (
+                  <FarmerCard
+                    key={farmer.id}
+                    id={farmer.id}
+                    farmerId={farmer.farmerId}
+                    name={farmer.name}
+                    nameOdia={farmer.nameOdia}
+                    contact={farmer.contact}
+                    village={farmer.address.village}
+                    block={farmer.address.block}
+                    totalLivestock={farmer.totalLivestock}
+                    livestock={farmer.livestock}
+                    kycStatus={farmer.kycStatus}
+                    insuranceStatus={farmer.insuranceStatus}
+                    schemes={farmer.schemes}
+                    onClick={() => handleFarmerClick(farmer)}
+                    viewMode="list"
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredFarmers.map((farmer) => (
+            <FarmerCard
+              key={farmer.id}
+              id={farmer.id}
+              farmerId={farmer.farmerId}
+              name={farmer.name}
+              nameOdia={farmer.nameOdia}
+              contact={farmer.contact}
+              village={farmer.address.village}
+              block={farmer.address.block}
+              totalLivestock={farmer.totalLivestock}
+              livestock={farmer.livestock}
+              kycStatus={farmer.kycStatus}
+              insuranceStatus={farmer.insuranceStatus}
+              schemes={farmer.schemes}
+              onClick={() => handleFarmerClick(farmer)}
+              viewMode="grid"
+            />
+          ))}
+        </div>
+      )}
 
       {filteredFarmers.length === 0 && (
         <div className="glass-card rounded-2xl p-12 text-center">

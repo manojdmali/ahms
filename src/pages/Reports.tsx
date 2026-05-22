@@ -1,16 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import {
-  Search,
-  Filter,
-  FileText,
-  Download,
-  Eye,
-  TrendingUp,
-  BarChart3,
-  Calendar,
-  RefreshCw
-} from 'lucide-react';
+import { Search, Filter, FileText, Download, Eye, TrendingUp, BarChart3, Calendar, RefreshCw } from 'lucide-react';
+import { ViewToggle } from '../components/ui/ViewToggle';
 import { ReportCard } from '../components/reports/ReportCard';
 import { ReportDetail } from '../components/reports/ReportDetail';
 import { reportsData, reportCategories, Report as ReportType } from '../data/reportsData';
@@ -19,6 +10,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 export default function Reports() {
   const { t } = useLanguage();
   const [selectedReport, setSelectedReport] = useState<ReportType | null>(null);
+  const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
@@ -135,7 +127,7 @@ export default function Reports() {
         </div>
 
         {/* Action Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-white/20">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-white/20">
           <div className="flex flex-wrap items-center gap-2">
             <button className="px-3 sm:px-4 py-2 rounded-xl bg-white/70 hover:bg-white border border-white/30 transition-all flex items-center gap-2 text-xs sm:text-sm">
               <Filter size={16} />
@@ -149,10 +141,13 @@ export default function Reports() {
             </button>
           </div>
 
-          <p className="text-xs sm:text-sm text-slate-600">
-            {t('Showing', 'दिखा रहा है', 'ଦେଖାଯାଉଛି')} <span className="font-mono text-slate-900">{filteredReports.length}</span> {t('of', 'का', 'ର')}{' '}
-            <span className="font-mono text-slate-900">{reports.length}</span> {t('reports', 'रिपोर्ट', 'ରିପୋର୍ଟ')}
-          </p>
+          <div className="flex items-center gap-3">
+            <ViewToggle value={displayMode} onChange={setDisplayMode} />
+            <p className="text-xs sm:text-sm text-slate-600">
+              {t('Showing', 'दिखा रहा है', 'ଦେଖାଯାଉଛି')} <span className="font-mono text-slate-900">{filteredReports.length}</span> {t('of', 'का', 'ର')}{' '}
+              <span className="font-mono text-slate-900">{reports.length}</span> {t('reports', 'रिपोर्ट', 'ରିପୋର୍ଟ')}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -277,26 +272,70 @@ export default function Reports() {
         </button>
       </div>
 
-      {/* Reports Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-        {filteredReports.map((report) => (
-          <ReportCard
-            key={report.id}
-            reportId={report.reportId}
-            title={report.title}
-            titleOdia={report.titleOdia}
-            category={report.category}
-            type={report.type}
-            period={report.period}
-            generatedDate={report.generatedDate}
-            status={report.status}
-            downloads={report.downloads}
-            views={report.views}
-            metrics={report.metrics}
-            onClick={() => setSelectedReport(report)}
-          />
-        ))}
-      </div>
+      {/* Reports Grid / List */}
+      {displayMode === 'list' ? (
+        <div className="glass-card-darker rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50/80 border-b border-slate-200">
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Report</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Category</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Type</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Period</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Generated</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Downloads</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+                  <th className="px-4 py-2.5" />
+                </tr>
+              </thead>
+              <tbody className="bg-white/40">
+                {filteredReports.map((r) => (
+                  <tr key={r.id} onClick={() => setSelectedReport(r)} className="border-b border-slate-100 last:border-0 hover:bg-green-50/50 cursor-pointer transition-colors">
+                    <td className="px-4 py-3">
+                      <p className="text-sm font-medium text-slate-900 max-w-[180px] truncate">{r.title}</p>
+                      <p className="text-xs text-slate-400 font-mono">{r.reportId}</p>
+                    </td>
+                    <td className="px-4 py-3"><span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full capitalize">{r.category}</span></td>
+                    <td className="px-4 py-3"><span className="text-xs px-2 py-0.5 bg-purple-50 text-purple-700 rounded-full capitalize">{r.type}</span></td>
+                    <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{r.period}</td>
+                    <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{r.generatedDate}</td>
+                    <td className="px-4 py-3 font-mono text-sm text-slate-700">{r.downloads.toLocaleString()}</td>
+                    <td className="px-4 py-3">
+                      <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${
+                        r.status === 'ready' ? 'bg-green-50 text-green-700' :
+                        r.status === 'generating' ? 'bg-amber-50 text-amber-700' :
+                        'bg-blue-50 text-blue-700'
+                      }`}>{r.status}</span>
+                    </td>
+                    <td className="px-4 py-3 text-right"><span className="text-xs text-green-600">View →</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+          {filteredReports.map((report) => (
+            <ReportCard
+              key={report.id}
+              reportId={report.reportId}
+              title={report.title}
+              titleOdia={report.titleOdia}
+              category={report.category}
+              type={report.type}
+              period={report.period}
+              generatedDate={report.generatedDate}
+              status={report.status}
+              downloads={report.downloads}
+              views={report.views}
+              metrics={report.metrics}
+              onClick={() => setSelectedReport(report)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Empty State */}
       {filteredReports.length === 0 && (

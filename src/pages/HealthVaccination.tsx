@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Plus, FileText, Calendar, Activity, Download, Search, Filter } from 'lucide-react';
+import { ViewToggle } from '../components/ui/ViewToggle';
 import { VaccinationCalendar } from '../components/health/VaccinationCalendar';
 import { HealthRecordForm } from '../components/health/HealthRecordForm';
 import { DiseaseAlertBanner } from '../components/health/DiseaseAlertBanner';
@@ -173,6 +174,7 @@ export default function HealthVaccination() {
   const [isHealthFormOpen, setIsHealthFormOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<any>(null);
+  const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -468,7 +470,8 @@ export default function HealthVaccination() {
               <h3 className="text-slate-800 mb-1">{t('Health Records', 'स्वास्थ्य रिकॉर्ड', 'ସ୍ୱାସ୍ଥ୍ୟ ରେକର୍ଡ')}</h3>
               <p className="text-sm text-slate-600">{t('Manage health records for your block', 'अपने ब्लॉक के लिए स्वास्थ्य रिकॉर्ड प्रबंधित करें', 'ଆପଣଙ୍କ ବ୍ଲକ ପାଇଁ ସ୍ୱାସ୍ଥ୍ୟ ରେକର୍ଡ ପରିଚାଳନ କରନ୍ତୁ')}</p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex items-center gap-3">
+              <ViewToggle value={displayMode} onChange={setDisplayMode} />
               <div className="relative">
                 <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" />
                 <input
@@ -508,27 +511,78 @@ export default function HealthVaccination() {
             </div>
           </div>
 
-          <div className="space-y-3">
-            {filteredRecords.map((record, index) => (
-              <HealthRecordCard
-                key={index}
-                recordId={record.recordId}
-                animalTag={record.animalTag}
-                animalName={record.animalName}
-                farmerName={record.farmerName}
-                date={record.date}
-                type={record.type}
-                status={record.status}
-                vetOfficer={record.vetOfficer.name}
-                diagnosis={record.diagnosis}
-                disease={record.disease}
-                temperature={record.temperature}
-                severity={record.severity}
-                followUpDate={record.followUp?.date}
-                onClick={() => handleRecordClick(record)}
-              />
-            ))}
-          </div>
+          {displayMode === 'list' ? (
+            <div className="glass-card-darker rounded-2xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-slate-50/80 border-b border-slate-200">
+                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Record</th>
+                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Animal</th>
+                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Farmer</th>
+                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Type</th>
+                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Disease</th>
+                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Date</th>
+                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+                      <th className="px-4 py-2.5" />
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white/40">
+                    {filteredRecords.map((record, index) => (
+                      <tr key={index} onClick={() => handleRecordClick(record)} className="border-b border-slate-100 last:border-0 hover:bg-green-50/50 cursor-pointer transition-colors">
+                        <td className="px-4 py-3">
+                          <p className="text-xs font-mono text-slate-500">{record.recordId}</p>
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="text-sm font-medium text-slate-900">{record.animalName || '—'}</p>
+                          <p className="text-xs text-slate-400 font-mono">{record.animalTag}</p>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-slate-700">{record.farmerName}</td>
+                        <td className="px-4 py-3">
+                          <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${
+                            record.type === 'emergency' ? 'bg-red-50 text-red-700' :
+                            record.type === 'vaccination' ? 'bg-blue-50 text-blue-700' :
+                            record.type === 'treatment' ? 'bg-amber-50 text-amber-700' :
+                            'bg-green-50 text-green-700'
+                          }`}>{record.type}</span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-slate-600 max-w-[120px] truncate">{record.disease || '—'}</td>
+                        <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{new Date(record.date).toLocaleDateString()}</td>
+                        <td className="px-4 py-3">
+                          <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${
+                            record.status === 'completed' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'
+                          }`}>{record.status.replace('-', ' ')}</span>
+                        </td>
+                        <td className="px-4 py-3 text-right"><span className="text-xs text-green-600">View →</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredRecords.map((record, index) => (
+                <HealthRecordCard
+                  key={index}
+                  recordId={record.recordId}
+                  animalTag={record.animalTag}
+                  animalName={record.animalName}
+                  farmerName={record.farmerName}
+                  date={record.date}
+                  type={record.type}
+                  status={record.status}
+                  vetOfficer={record.vetOfficer.name}
+                  diagnosis={record.diagnosis}
+                  disease={record.disease}
+                  temperature={record.temperature}
+                  severity={record.severity}
+                  followUpDate={record.followUp?.date}
+                  onClick={() => handleRecordClick(record)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 

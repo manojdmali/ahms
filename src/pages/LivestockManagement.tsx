@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Plus, Search, Filter, Download, Grid, List } from 'lucide-react';
+import { Plus, Search, Filter, Download } from 'lucide-react';
+import { ViewToggle } from '../components/ui/ViewToggle';
 import { AnimalCard } from '../components/livestock/AnimalCard';
 import { RegistrationWizard } from '../components/livestock/RegistrationWizard';
 import { AnimalProfile } from '../components/livestock/AnimalProfile';
 import { useLanguage } from '../contexts/LanguageContext';
 
-type ViewMode = 'list' | 'grid' | 'profile';
+type ViewMode = 'grid' | 'profile';
+type DisplayMode = 'grid' | 'list';
 
 export default function LivestockManagement() {
   const { t } = useLanguage();
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('grid');
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSpecies, setSelectedSpecies] = useState('all');
@@ -176,29 +179,7 @@ export default function LivestockManagement() {
             </button>
           </div>
 
-          {/* View Toggle */}
-          <div className="flex items-center gap-2 bg-white/70 rounded-xl p-1 border border-white/30">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
-                viewMode === 'grid'
-                  ? 'bg-white shadow-sm text-green-600'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Grid size={16} />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
-                viewMode === 'list'
-                  ? 'bg-white shadow-sm text-green-600'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <List size={16} />
-            </button>
-          </div>
+          <ViewToggle value={displayMode} onChange={setDisplayMode} />
         </div>
       </div>
 
@@ -227,86 +208,55 @@ export default function LivestockManagement() {
       </div>
 
       {/* Animals Grid/List */}
-      {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {displayMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {animals.map((animal, index) => (
-            <AnimalCard
-              key={index}
-              {...animal}
-              onClick={() => setViewMode('profile')}
-            />
+            <AnimalCard key={index} {...animal} onClick={() => setViewMode('profile')} />
           ))}
         </div>
       ) : (
-        <div className="glass-card rounded-2xl overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-white/50 border-b border-white/30">
-              <tr>
-                <th className="text-left px-6 py-4 text-sm text-slate-700">{t('Tag ID', 'टैग ID', 'ଟ୍ୟାଗ୍ ID')}</th>
-                <th className="text-left px-6 py-4 text-sm text-slate-700">{t('Breed', 'नस्ल', 'ପ୍ରଜାତି')}</th>
-                <th className="text-left px-6 py-4 text-sm text-slate-700">{t('Owner', 'मालिक', 'ମାଲିକ')}</th>
-                <th className="text-left px-6 py-4 text-sm text-slate-700">{t('Location', 'स्थान', 'ସ୍ଥାନ')}</th>
-                <th className="text-left px-6 py-4 text-sm text-slate-700">{t('Health Score', 'स्वास्थ्य स्कोर', 'ସ୍ୱାସ୍ଥ୍ୟ ସ୍କୋର')}</th>
-                <th className="text-left px-6 py-4 text-sm text-slate-700">{t('Status', 'स्थिति', 'ସ୍ଥିତି')}</th>
-                <th className="text-left px-6 py-4 text-sm text-slate-700">{t('Actions', 'क्रियाएं', 'କାର୍ଯ୍ୟ')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {animals.map((animal, index) => (
-                <tr
-                  key={index}
-                  onClick={() => setViewMode('profile')}
-                  className="border-b border-white/20 hover:bg-white/30 cursor-pointer transition-all"
-                >
-                  <td className="px-6 py-4">
-                    <span className="text-sm font-mono text-slate-900">{animal.tag}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-slate-900">{animal.breed}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-slate-900">{animal.owner}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-slate-600">{animal.location}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full ${
-                            animal.healthScore >= 80
-                              ? 'bg-green-500'
-                              : animal.healthScore >= 60
-                              ? 'bg-amber-500'
-                              : 'bg-red-500'
-                          }`}
-                          style={{ width: `${animal.healthScore}%` }}
-                        />
-                      </div>
-                      <span className="text-sm font-mono text-slate-700">{animal.healthScore}%</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    {animal.insurance ? (
-                      <span className="px-2 py-1 bg-green-50 text-green-700 rounded-full text-xs">
-                        {t('Insured', 'बीमाकृत', 'ବୀମାଭୁକ୍ତ')}
-                      </span>
-                    ) : (
-                      <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-full text-xs">
-                        {t('Not Insured', 'अबीमाकृत', 'ବୀମାଭୁକ୍ତ ନୁହେଁ')}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <button className="text-sm text-green-600 hover:text-green-700">
-                      {t('View', 'देखें', 'ଦେଖନ୍ତୁ')} →
-                    </button>
-                  </td>
+        <div className="glass-card-darker rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-slate-50/80 border-b border-slate-200">
+                <tr>
+                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">{t('Tag ID', 'टैग ID', 'ଟ୍ୟାଗ୍ ID')}</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">{t('Breed', 'नस्ल', 'ପ୍ରଜାତି')}</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">{t('Owner', 'मालिक', 'ମାଲିକ')}</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">{t('Location', 'स्थान', 'ସ୍ଥାନ')}</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">{t('Health', 'स्वास्थ्य', 'ସ୍ୱାସ୍ଥ୍ୟ')}</th>
+                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">{t('Insurance', 'बीमा', 'ବୀମା')}</th>
+                  <th className="px-4 py-2.5" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white/40">
+                {animals.map((animal, index) => (
+                  <tr key={index} onClick={() => setViewMode('profile')} className="border-b border-slate-100 last:border-0 hover:bg-green-50/50 cursor-pointer transition-colors">
+                    <td className="px-4 py-3 font-mono text-xs text-slate-700 whitespace-nowrap">{animal.tag}</td>
+                    <td className="px-4 py-3 text-sm text-slate-900">{animal.breed}</td>
+                    <td className="px-4 py-3 text-sm text-slate-900">{animal.owner}</td>
+                    <td className="px-4 py-3 text-xs text-slate-600">{animal.location}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-14 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${
+                            animal.healthScore >= 80 ? 'bg-green-500' : animal.healthScore >= 60 ? 'bg-amber-500' : 'bg-red-500'
+                          }`} style={{ width: `${animal.healthScore}%` }} />
+                        </div>
+                        <span className="text-xs font-mono text-slate-700">{animal.healthScore}%</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        animal.insurance ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'
+                      }`}>{animal.insurance ? t('Insured', 'बीमाकृत', 'ବୀମାଭୁକ୍ତ') : t('No', 'नहीं', 'ନା')}</span>
+                    </td>
+                    <td className="px-4 py-3 text-right"><span className="text-xs text-green-600">View →</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

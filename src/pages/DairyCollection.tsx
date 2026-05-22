@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Plus, Search, Filter, Download, Droplet, TrendingUp, Calendar, DollarSign, Users } from 'lucide-react';
+import { ViewToggle } from '../components/ui/ViewToggle';
 import { CollectionCard } from '../components/dairy/CollectionCard';
 import { CollectionEntryForm } from '../components/dairy/CollectionEntryForm';
 import { CollectionDetail } from '../components/dairy/CollectionDetail';
@@ -11,6 +12,7 @@ export default function DairyCollection() {
   const { t } = useLanguage();
   const [isEntryFormOpen, setIsEntryFormOpen] = useState(false);
   const [selectedCollection, setSelectedCollection] = useState<DairyCollectionType | null>(null);
+  const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState('all');
   const [selectedSession, setSelectedSession] = useState('all');
@@ -156,10 +158,13 @@ export default function DairyCollection() {
             </button>
           </div>
 
-          <p className="text-sm text-slate-600">
-            {t('Showing', 'दिखा रहा है', 'ଦେଖାଯାଉଛି')} <span className="font-mono text-slate-900">{filteredCollections.length}</span> {t('of', 'का', 'ର')}{' '}
-            <span className="font-mono text-slate-900">{collections.length}</span> {t('collections', 'संग्रह', 'ସଂଗ୍ରହ')}
-          </p>
+          <div className="flex items-center gap-3">
+            <ViewToggle value={displayMode} onChange={setDisplayMode} />
+            <p className="text-sm text-slate-600">
+              {t('Showing', 'दिखा रहा है', 'ଦେଖାଯାଉଛି')} <span className="font-mono text-slate-900">{filteredCollections.length}</span> {t('of', 'का', 'ର')}{' '}
+              <span className="font-mono text-slate-900">{collections.length}</span> {t('collections', 'संग्रह', 'ସଂଗ୍ରହ')}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -239,26 +244,73 @@ export default function DairyCollection() {
         </div>
       )}
 
-      {/* Collections Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredCollections.map((collection) => (
-          <CollectionCard
-            key={collection.id}
-            collectionId={collection.collectionId}
-            farmerName={collection.farmerName}
-            farmerNameOdia={collection.farmerNameOdia}
-            date={collection.date}
-            session={collection.session}
-            quantity={collection.quantity}
-            fat={collection.fat}
-            snf={collection.snf}
-            quality={collection.quality}
-            totalAmount={collection.totalAmount}
-            status={collection.status}
-            onClick={() => setSelectedCollection(collection)}
-          />
-        ))}
-      </div>
+      {/* Collections Grid / List */}
+      {displayMode === 'list' ? (
+        <div className="glass-card-darker rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50/80 border-b border-slate-200">
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">ID</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Farmer</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Date</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Session</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Qty (L)</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Fat%</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">SNF%</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Amount</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+                  <th className="px-4 py-2.5" />
+                </tr>
+              </thead>
+              <tbody className="bg-white/40">
+                {filteredCollections.map((c) => (
+                  <tr key={c.id} onClick={() => setSelectedCollection(c)} className="border-b border-slate-100 last:border-0 hover:bg-green-50/50 cursor-pointer transition-colors">
+                    <td className="px-4 py-2.5 font-mono text-xs text-slate-500">{c.collectionId}</td>
+                    <td className="px-4 py-2.5 text-sm font-medium text-slate-900 max-w-[130px] truncate">{c.farmerName}</td>
+                    <td className="px-4 py-2.5 text-xs text-slate-600 whitespace-nowrap">{c.date}</td>
+                    <td className="px-4 py-2.5">
+                      <span className="text-xs">{c.session === 'morning' ? '🌅 Morning' : '🌆 Evening'}</span>
+                    </td>
+                    <td className="px-4 py-2.5 font-mono text-sm text-slate-900">{c.quantity.toFixed(2)}</td>
+                    <td className="px-4 py-2.5 font-mono text-sm text-blue-700">{c.fat.toFixed(2)}</td>
+                    <td className="px-4 py-2.5 font-mono text-sm text-purple-700">{c.snf.toFixed(2)}</td>
+                    <td className="px-4 py-2.5 font-mono text-sm text-green-700">₹{c.totalAmount.toFixed(2)}</td>
+                    <td className="px-4 py-2.5">
+                      <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${
+                        c.status === 'paid' ? 'bg-green-50 text-green-700' :
+                        c.status === 'approved' ? 'bg-blue-50 text-blue-700' :
+                        'bg-amber-50 text-amber-700'
+                      }`}>{c.status}</span>
+                    </td>
+                    <td className="px-4 py-2.5 text-right"><span className="text-xs text-green-600">View →</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {filteredCollections.map((collection) => (
+            <CollectionCard
+              key={collection.id}
+              collectionId={collection.collectionId}
+              farmerName={collection.farmerName}
+              farmerNameOdia={collection.farmerNameOdia}
+              date={collection.date}
+              session={collection.session}
+              quantity={collection.quantity}
+              fat={collection.fat}
+              snf={collection.snf}
+              quality={collection.quality}
+              totalAmount={collection.totalAmount}
+              status={collection.status}
+              onClick={() => setSelectedCollection(collection)}
+            />
+          ))}
+        </div>
+      )}
 
       {filteredCollections.length === 0 && (
         <div className="glass-card rounded-2xl p-12 text-center">

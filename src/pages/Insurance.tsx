@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Search, Filter, Download, Shield, TrendingUp, Users, IndianRupee, Award, FileText } from 'lucide-react';
+import { ViewToggle } from '../components/ui/ViewToggle';
 import { InsuranceCard } from '../components/insurance/InsuranceCard';
 import { InsuranceDetail } from '../components/insurance/InsuranceDetail';
 import { insuranceData, insuranceCategories, Insurance as InsuranceType } from '../data/insuranceData';
@@ -9,6 +10,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 export default function Insurance() {
   const { t } = useLanguage();
   const [selectedInsurance, setSelectedInsurance] = useState<InsuranceType | null>(null);
+  const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -109,7 +111,7 @@ export default function Insurance() {
         </div>
 
         {/* Action Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-white/20">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-white/20">
           <div className="flex flex-wrap items-center gap-2">
             <button className="px-3 sm:px-4 py-2 rounded-xl bg-white/70 hover:bg-white border border-white/30 transition-all flex items-center gap-2 text-xs sm:text-sm">
               <Filter size={16} />
@@ -123,10 +125,13 @@ export default function Insurance() {
             </button>
           </div>
 
-          <p className="text-xs sm:text-sm text-slate-600">
-            {t('Showing', 'दिखा रहा है', 'ଦେଖାଯାଉଛି')} <span className="font-mono text-slate-900">{filteredInsurances.length}</span> {t('of', 'का', 'ର')}{' '}
-            <span className="font-mono text-slate-900">{insurances.length}</span> {t('policies', 'पॉलिसियां', 'ପଲିସି')}
-          </p>
+          <div className="flex items-center gap-3">
+            <ViewToggle value={displayMode} onChange={setDisplayMode} />
+            <p className="text-xs sm:text-sm text-slate-600">
+              {t('Showing', 'दिखा रहा है', 'ଦେଖାଯାଉଛି')} <span className="font-mono text-slate-900">{filteredInsurances.length}</span> {t('of', 'का', 'ର')}{' '}
+              <span className="font-mono text-slate-900">{insurances.length}</span> {t('policies', 'पॉलिसियां', 'ପଲିସି')}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -203,29 +208,73 @@ export default function Insurance() {
         </div>
       </div>
 
-      {/* Insurance Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        {filteredInsurances.map((insurance) => (
-          <InsuranceCard
-            key={insurance.id}
-            policyId={insurance.policyId}
-            name={insurance.name}
-            nameOdia={insurance.nameOdia}
-            provider={insurance.provider}
-            category={insurance.category}
-            coverageAmount={insurance.coverageAmount}
-            premiumAmount={insurance.premiumAmount}
-            netPremium={insurance.netPremium}
-            subsidyPercentage={insurance.subsidyPercentage}
-            activePolicies={insurance.activePolicies}
-            claimSettlementRatio={insurance.claimSettlementRatio}
-            status={insurance.status}
-            rating={insurance.rating}
-            reviews={insurance.reviews}
-            onClick={() => setSelectedInsurance(insurance)}
-          />
-        ))}
-      </div>
+      {/* Insurance Grid / List */}
+      {displayMode === 'list' ? (
+        <div className="glass-card-darker rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50/80 border-b border-slate-200">
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Policy</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Provider</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Category</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Coverage</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Premium</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Settlement</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+                  <th className="px-4 py-2.5" />
+                </tr>
+              </thead>
+              <tbody className="bg-white/40">
+                {filteredInsurances.map((ins) => (
+                  <tr key={ins.id} onClick={() => setSelectedInsurance(ins)} className="border-b border-slate-100 last:border-0 hover:bg-green-50/50 cursor-pointer transition-colors">
+                    <td className="px-4 py-3">
+                      <p className="text-sm font-medium text-slate-900 max-w-[160px] truncate">{ins.name}</p>
+                      <p className="text-xs text-slate-400 font-mono">{ins.policyId}</p>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-slate-600 max-w-[120px] truncate">{ins.provider}</td>
+                    <td className="px-4 py-3"><span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full capitalize">{ins.category}</span></td>
+                    <td className="px-4 py-3 font-mono text-sm text-green-700">₹{(ins.coverageAmount / 100000).toFixed(1)}L</td>
+                    <td className="px-4 py-3 font-mono text-sm text-slate-700">₹{ins.netPremium.toLocaleString()}</td>
+                    <td className="px-4 py-3 font-mono text-sm text-purple-700">{ins.claimSettlementRatio}%</td>
+                    <td className="px-4 py-3">
+                      <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${
+                        ins.status === 'active' ? 'bg-green-50 text-green-700' :
+                        ins.status === 'popular' ? 'bg-amber-50 text-amber-700' :
+                        'bg-blue-50 text-blue-700'
+                      }`}>{ins.status}</span>
+                    </td>
+                    <td className="px-4 py-3 text-right"><span className="text-xs text-green-600">View →</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {filteredInsurances.map((insurance) => (
+            <InsuranceCard
+              key={insurance.id}
+              policyId={insurance.policyId}
+              name={insurance.name}
+              nameOdia={insurance.nameOdia}
+              provider={insurance.provider}
+              category={insurance.category}
+              coverageAmount={insurance.coverageAmount}
+              premiumAmount={insurance.premiumAmount}
+              netPremium={insurance.netPremium}
+              subsidyPercentage={insurance.subsidyPercentage}
+              activePolicies={insurance.activePolicies}
+              claimSettlementRatio={insurance.claimSettlementRatio}
+              status={insurance.status}
+              rating={insurance.rating}
+              reviews={insurance.reviews}
+              onClick={() => setSelectedInsurance(insurance)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Empty State */}
       {filteredInsurances.length === 0 && (

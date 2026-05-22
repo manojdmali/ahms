@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Search, Filter, Calendar, Award, Users, BookOpen, TrendingUp, CheckCircle } from 'lucide-react';
+import { ViewToggle } from '../components/ui/ViewToggle';
 import { TrainingCard } from '../components/training/TrainingCard';
 import { TrainingDetail } from '../components/training/TrainingDetail';
 import { TrainingRegistrationModal } from '../components/training/TrainingRegistrationModal';
@@ -11,6 +12,7 @@ export default function Training() {
   const { t } = useLanguage();
   const [selectedTraining, setSelectedTraining] = useState<TrainingType | null>(null);
   const [registrationTraining, setRegistrationTraining] = useState<TrainingType | null>(null);
+  const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
@@ -127,7 +129,7 @@ export default function Training() {
         </div>
 
         {/* Action Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-white/20">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-white/20">
           <div className="flex flex-wrap items-center gap-2">
             <button className="px-3 sm:px-4 py-2 rounded-xl bg-white/70 hover:bg-white border border-white/30 transition-all flex items-center gap-2 text-xs sm:text-sm">
               <Filter size={16} />
@@ -141,10 +143,13 @@ export default function Training() {
             </button>
           </div>
 
-          <p className="text-xs sm:text-sm text-slate-600">
-            {t('Showing', 'दिखा रहा है', 'ଦେଖାଯାଉଛି')} <span className="font-mono text-slate-900">{filteredTrainings.length}</span> {t('of', 'का', 'ର')}{' '}
-            <span className="font-mono text-slate-900">{trainings.length}</span> {t('trainings', 'प्रशिक्षण', 'ତାଲିମ')}
-          </p>
+          <div className="flex items-center gap-3">
+            <ViewToggle value={displayMode} onChange={setDisplayMode} />
+            <p className="text-xs sm:text-sm text-slate-600">
+              {t('Showing', 'दिखा रहा है', 'ଦେଖାଯାଉଛି')} <span className="font-mono text-slate-900">{filteredTrainings.length}</span> {t('of', 'का', 'ର')}{' '}
+              <span className="font-mono text-slate-900">{trainings.length}</span> {t('trainings', 'प्रशिक्षण', 'ତାଲିମ')}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -264,38 +269,85 @@ export default function Training() {
         </button>
       </div>
 
-      {/* Trainings Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-        {filteredTrainings.map((training) => (
-          <TrainingCard
-            key={training.id}
-            trainingId={training.trainingId}
-            title={training.title}
-            titleOdia={training.titleOdia}
-            category={training.category}
-            type={training.type}
-            duration={training.duration}
-            level={training.level}
-            instructor={training.instructor}
-            organization={training.organization}
-            startDate={training.startDate}
-            fees={training.fees}
-            netFees={training.netFees}
-            subsidy={training.subsidy}
-            seatsAvailable={training.seatsAvailable}
-            seatsTotal={training.seatsTotal}
-            rating={training.rating}
-            reviews={training.reviews}
-            status={training.status}
-            certification={training.certification}
-            onClick={() => setSelectedTraining(training)}
-            onRegister={(e) => {
-              e.stopPropagation();
-              setRegistrationTraining(training);
-            }}
-          />
-        ))}
-      </div>
+      {/* Trainings Grid / List */}
+      {displayMode === 'list' ? (
+        <div className="glass-card-darker rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50/80 border-b border-slate-200">
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Training</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Type</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Level</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Instructor</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Start Date</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Seats</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Fees</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+                  <th className="px-4 py-2.5" />
+                </tr>
+              </thead>
+              <tbody className="bg-white/40">
+                {filteredTrainings.map((tr) => (
+                  <tr key={tr.id} onClick={() => setSelectedTraining(tr)} className="border-b border-slate-100 last:border-0 hover:bg-green-50/50 cursor-pointer transition-colors">
+                    <td className="px-4 py-3">
+                      <p className="text-sm font-medium text-slate-900 max-w-[180px] truncate">{tr.title}</p>
+                      <p className="text-xs text-slate-400 font-mono">{tr.trainingId}</p>
+                    </td>
+                    <td className="px-4 py-3"><span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full capitalize">{tr.type}</span></td>
+                    <td className="px-4 py-3"><span className="text-xs px-2 py-0.5 bg-purple-50 text-purple-700 rounded-full capitalize">{tr.level}</span></td>
+                    <td className="px-4 py-3 text-xs text-slate-600 max-w-[120px] truncate">{tr.instructor}</td>
+                    <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{tr.startDate}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-slate-700">{tr.seatsAvailable}/{tr.seatsTotal}</td>
+                    <td className="px-4 py-3 font-mono text-sm text-green-700">{tr.netFees === 0 ? 'Free' : `₹${tr.netFees}`}</td>
+                    <td className="px-4 py-3">
+                      <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${
+                        tr.status === 'registration-open' ? 'bg-green-50 text-green-700' :
+                        tr.status === 'ongoing' ? 'bg-blue-50 text-blue-700' :
+                        tr.status === 'completed' ? 'bg-slate-100 text-slate-500' :
+                        'bg-amber-50 text-amber-700'
+                      }`}>{tr.status.replace('-', ' ')}</span>
+                    </td>
+                    <td className="px-4 py-3 text-right"><span className="text-xs text-green-600">View →</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+          {filteredTrainings.map((training) => (
+            <TrainingCard
+              key={training.id}
+              trainingId={training.trainingId}
+              title={training.title}
+              titleOdia={training.titleOdia}
+              category={training.category}
+              type={training.type}
+              duration={training.duration}
+              level={training.level}
+              instructor={training.instructor}
+              organization={training.organization}
+              startDate={training.startDate}
+              fees={training.fees}
+              netFees={training.netFees}
+              subsidy={training.subsidy}
+              seatsAvailable={training.seatsAvailable}
+              seatsTotal={training.seatsTotal}
+              rating={training.rating}
+              reviews={training.reviews}
+              status={training.status}
+              certification={training.certification}
+              onClick={() => setSelectedTraining(training)}
+              onRegister={(e) => {
+                e.stopPropagation();
+                setRegistrationTraining(training);
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Empty State */}
       {filteredTrainings.length === 0 && (

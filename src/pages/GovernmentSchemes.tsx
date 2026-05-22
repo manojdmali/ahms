@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Plus, Search, Filter, Download, FileText, TrendingUp, Users, IndianRupee, Award } from 'lucide-react';
+import { ViewToggle } from '../components/ui/ViewToggle';
 import { SchemeCard } from '../components/schemes/SchemeCard';
 import { SchemeDetail } from '../components/schemes/SchemeDetail';
 import { governmentSchemesData, schemeCategories, GovernmentScheme } from '../data/governmentSchemesData';
@@ -9,6 +10,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 export default function GovernmentSchemes() {
   const { t } = useLanguage();
   const [selectedScheme, setSelectedScheme] = useState<GovernmentScheme | null>(null);
+  const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -120,10 +122,13 @@ export default function GovernmentSchemes() {
             </button>
           </div>
 
-          <p className="text-sm text-slate-600">
-            {t('Showing', 'दिखा रहा है', 'ଦେଖାଯାଉଛି')} <span className="font-mono text-slate-900">{filteredSchemes.length}</span> {t('of', 'का', 'ର')}{' '}
-            <span className="font-mono text-slate-900">{schemes.length}</span> {t('schemes', 'योजनाएं', 'ଯୋଜନା')}
-          </p>
+          <div className="flex items-center gap-3">
+            <ViewToggle value={displayMode} onChange={setDisplayMode} />
+            <p className="text-sm text-slate-600">
+              {t('Showing', 'दिखा रहा है', 'ଦେଖାଯାଉଛି')} <span className="font-mono text-slate-900">{filteredSchemes.length}</span> {t('of', 'का', 'ର')}{' '}
+              <span className="font-mono text-slate-900">{schemes.length}</span> {t('schemes', 'योजनाएं', 'ଯୋଜନା')}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -200,25 +205,67 @@ export default function GovernmentSchemes() {
         </div>
       </div>
 
-      {/* Schemes Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredSchemes.map((scheme) => (
-          <SchemeCard
-            key={scheme.id}
-            schemeId={scheme.schemeId}
-            name={scheme.name}
-            nameOdia={scheme.nameOdia}
-            category={scheme.category}
-            description={scheme.description}
-            subsidyAmount={scheme.subsidyAmount}
-            coverageAmount={scheme.coverageAmount}
-            beneficiaries={scheme.beneficiaries}
-            status={scheme.status}
-            applicationDeadline={scheme.applicationDeadline}
-            onClick={() => setSelectedScheme(scheme)}
-          />
-        ))}
-      </div>
+      {/* Schemes Grid / List */}
+      {displayMode === 'list' ? (
+        <div className="glass-card-darker rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-50/80 border-b border-slate-200">
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Scheme</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Category</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Subsidy</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Beneficiaries</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Deadline</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
+                  <th className="px-4 py-2.5" />
+                </tr>
+              </thead>
+              <tbody className="bg-white/40">
+                {filteredSchemes.map((s) => (
+                  <tr key={s.id} onClick={() => setSelectedScheme(s)} className="border-b border-slate-100 last:border-0 hover:bg-green-50/50 cursor-pointer transition-colors">
+                    <td className="px-4 py-3">
+                      <p className="text-sm font-medium text-slate-900 max-w-[200px] truncate">{s.name}</p>
+                      <p className="text-xs text-slate-400 font-mono">{s.schemeId}</p>
+                    </td>
+                    <td className="px-4 py-3"><span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full capitalize">{s.category}</span></td>
+                    <td className="px-4 py-3 font-mono text-sm text-green-700">{s.subsidyAmount ? `₹${s.subsidyAmount.toLocaleString()}` : '—'}</td>
+                    <td className="px-4 py-3 font-mono text-sm text-slate-700">{s.beneficiaries.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{s.applicationDeadline || '—'}</td>
+                    <td className="px-4 py-3">
+                      <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${
+                        s.status === 'active' ? 'bg-green-50 text-green-700' :
+                        s.status === 'upcoming' ? 'bg-blue-50 text-blue-700' :
+                        'bg-slate-100 text-slate-500'
+                      }`}>{s.status}</span>
+                    </td>
+                    <td className="px-4 py-3 text-right"><span className="text-xs text-green-600">View →</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {filteredSchemes.map((scheme) => (
+            <SchemeCard
+              key={scheme.id}
+              schemeId={scheme.schemeId}
+              name={scheme.name}
+              nameOdia={scheme.nameOdia}
+              category={scheme.category}
+              description={scheme.description}
+              subsidyAmount={scheme.subsidyAmount}
+              coverageAmount={scheme.coverageAmount}
+              beneficiaries={scheme.beneficiaries}
+              status={scheme.status}
+              applicationDeadline={scheme.applicationDeadline}
+              onClick={() => setSelectedScheme(scheme)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Empty State */}
       {filteredSchemes.length === 0 && (
