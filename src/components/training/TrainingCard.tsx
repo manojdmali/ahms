@@ -14,6 +14,7 @@ import {
   Globe
 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface TrainingCardProps {
   trainingId: string;
@@ -180,7 +181,7 @@ export function TrainingCard({
         <div className="flex items-center gap-2 text-sm text-slate-700">
           <Calendar size={14} className="text-purple-600 flex-shrink-0" />
           <span className="text-xs sm:text-sm">
-            {new Date(startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+            {formatDisplayDate(startDate)}
           </span>
         </div>
 

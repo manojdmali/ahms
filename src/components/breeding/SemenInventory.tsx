@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FlaskConical, Package, AlertTriangle, TrendingUp, Search, Filter } from 'lucide-react';
 import { motion } from 'motion/react';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface SemenStock {
   id: string;
@@ -261,7 +262,7 @@ export function SemenInventory() {
                   <td className="px-4 py-3">
                     <div>
                       <p className={`text-sm ${isExpiringSoon ? 'text-red-600' : 'text-slate-700'}`}>
-                        {stock.expiryDate.toLocaleDateString()}
+                        {formatDisplayDate(stock.expiryDate)}
                       </p>
                       <p className="text-xs text-slate-500">
                         {daysUntilExpiry} days left

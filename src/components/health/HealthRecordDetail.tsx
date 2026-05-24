@@ -30,6 +30,7 @@ import {
   X
 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface HealthRecordDetailProps {
   record: {
@@ -301,11 +302,7 @@ export function HealthRecordDetail({ record, onBack, onEdit, onDelete }: HealthR
               <div>
                 <p className="text-xs text-slate-500 mb-1">{t('Date', 'तारीख', 'ତାରିଖ')}</p>
                 <p className="text-sm text-slate-900">
-                  {new Date(record.date).toLocaleDateString('en-IN', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                  })}
+                  {formatDisplayDate(record.date)}
                 </p>
               </div>
               {record.location && (
@@ -523,14 +520,14 @@ export function HealthRecordDetail({ record, onBack, onEdit, onDelete }: HealthR
                     <div>
                       <p className="text-xs text-slate-500 mb-1">{t('Expiry Date', 'समाप्ति तिथि', 'ସମାପ୍ତି ତାରିଖ')}</p>
                       <p className="text-sm text-slate-700">
-                        {new Date(record.vaccination.expiryDate).toLocaleDateString()}
+                        {formatDisplayDate(record.vaccination.expiryDate)}
                       </p>
                     </div>
                     {record.vaccination.nextDose && (
                       <div className="sm:col-span-2">
                         <p className="text-xs text-slate-500 mb-1">{t('Next Dose Due', 'अगली खुराक', 'ପରବର୍ତ୍ତୀ ମାତ୍ରା')}</p>
                         <p className="text-sm font-medium text-green-700">
-                          {new Date(record.vaccination.nextDose).toLocaleDateString()}
+                          {formatDisplayDate(record.vaccination.nextDose)}
                         </p>
                       </div>
                     )}
@@ -657,7 +654,7 @@ export function HealthRecordDetail({ record, onBack, onEdit, onDelete }: HealthR
                       <div>
                         <p className="text-sm font-medium text-slate-900">{t('Current Record', 'वर्तमान रिकॉर्ड', 'ବର୍ତ୍ତମାନ ରେକର୍ଡ')}</p>
                         <p className="text-xs text-slate-500 mt-1">
-                          {new Date(record.date).toLocaleDateString()}
+                          {formatDisplayDate(record.date)}
                         </p>
                       </div>
                       <span className={`px-2 py-1 rounded text-xs ${statusConfig[record.status].bg} ${statusConfig[record.status].text}`}>
@@ -688,11 +685,7 @@ export function HealthRecordDetail({ record, onBack, onEdit, onDelete }: HealthR
                   <div className="flex items-center gap-2 text-sm">
                     <Calendar size={14} className="text-purple-600" />
                     <span className="font-medium text-purple-900">
-                      {new Date(record.followUp.date).toLocaleDateString('en-IN', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      })}
+                      {formatDisplayDate(record.followUp.date)}
                     </span>
                   </div>
                 </div>

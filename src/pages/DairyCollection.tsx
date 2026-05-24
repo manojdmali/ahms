@@ -7,6 +7,7 @@ import { CollectionEntryForm } from '../components/dairy/CollectionEntryForm';
 import { CollectionDetail } from '../components/dairy/CollectionDetail';
 import { dairyCollectionData, DairyCollection as DairyCollectionType } from '../data/dairyCollectionData';
 import { useLanguage } from '../contexts/LanguageContext';
+import { formatDisplayDate } from '../utils/dateFormat';
 
 export default function DairyCollection() {
   const { t } = useLanguage();
@@ -111,7 +112,7 @@ export default function DairyCollection() {
               <option value="all">{t('All Dates', 'सभी तारीखें', 'ସମସ୍ତ ତାରିଖ')}</option>
               {dates.map((date) => (
                 <option key={date} value={date}>
-                  {new Date(date).toLocaleDateString()}
+                  {formatDisplayDate(date)}
                 </option>
               ))}
             </select>
@@ -268,7 +269,7 @@ export default function DairyCollection() {
                   <tr key={c.id} onClick={() => setSelectedCollection(c)} className="border-b border-slate-100 last:border-0 hover:bg-green-50/50 cursor-pointer transition-colors">
                     <td className="px-4 py-2.5 font-mono text-xs text-slate-500">{c.collectionId}</td>
                     <td className="px-4 py-2.5 text-sm font-medium text-slate-900 max-w-[130px] truncate">{c.farmerName}</td>
-                    <td className="px-4 py-2.5 text-xs text-slate-600 whitespace-nowrap">{c.date}</td>
+                    <td className="px-4 py-2.5 text-xs text-slate-600 whitespace-nowrap">{formatDisplayDate(c.date)}</td>
                     <td className="px-4 py-2.5">
                       <span className="text-xs">{c.session === 'morning' ? '🌅 Morning' : '🌆 Evening'}</span>
                     </td>

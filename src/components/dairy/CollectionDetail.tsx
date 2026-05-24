@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { 
+import {
   ArrowLeft, 
   Edit, 
   Printer, 
@@ -19,6 +19,7 @@ import {
   Activity
 } from 'lucide-react';
 import { DairyCollection } from '../../data/dairyCollectionData';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface CollectionDetailProps {
   collection: DairyCollection;
@@ -110,12 +111,7 @@ export function CollectionDetail({ collection, onBack }: CollectionDetailProps) 
               <div className="flex items-center gap-2 text-sm text-slate-600">
                 <Calendar size={16} />
                 <div>
-                  <p className="text-slate-900">{new Date(collection.date).toLocaleDateString('en-IN', { 
-                    weekday: 'short', 
-                    year: 'numeric', 
-                    month: 'short', 
-                    day: 'numeric' 
-                  })}</p>
+                  <p className="text-slate-900">{formatDisplayDate(collection.date)}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-sm text-slate-600">
@@ -299,11 +295,7 @@ export function CollectionDetail({ collection, onBack }: CollectionDetailProps) 
                 <div className="flex justify-between py-2">
                   <span className="text-slate-600">Payment Date:</span>
                   <span className="text-slate-900">
-                    {new Date(collection.paymentDate).toLocaleDateString('en-IN', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}
+                    {formatDisplayDate(collection.paymentDate)}
                   </span>
                 </div>
               )}
@@ -351,12 +343,7 @@ export function CollectionDetail({ collection, onBack }: CollectionDetailProps) 
             <div className="flex justify-between py-2 border-b border-slate-200">
               <span className="text-slate-600">Collection Date:</span>
               <span className="text-slate-900">
-                {new Date(collection.date).toLocaleDateString('en-IN', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
+                {formatDisplayDate(collection.date)}
               </span>
             </div>
             <div className="flex justify-between py-2 border-b border-slate-200">

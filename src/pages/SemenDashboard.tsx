@@ -12,6 +12,7 @@ import {
   FileSpreadsheet,
   FlaskConical,
   Map,
+  MapPin,
   PackageCheck,
   Send,
   ShieldAlert,
@@ -201,10 +202,7 @@ function DirectorateShell({
           <h2 className="text-2xl text-slate-900 mb-1">Odisha Semen Stock & Forecasting Flow</h2>
           <p className="text-sm text-slate-600">All Directorate semen screens mapped for demo navigation.</p>
         </div>
-        <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/70 border border-white/30">
-          <CheckCircle2 size={18} className="text-green-600" />
-          <span className="text-sm text-slate-700">{screenMeta[activeScreen].id}</span>
-        </div>
+
       </div>
       <div className="flex flex-wrap gap-2">
         {Object.entries(screenMeta).map(([key, item]) => (
@@ -217,7 +215,7 @@ function DirectorateShell({
                 : 'bg-white/70 text-slate-700 border-white/40 hover:bg-white'
             }`}
           >
-            {item.id} {item.label}
+            {item.label}
           </button>
         ))}
       </div>
@@ -264,7 +262,7 @@ function StateDashboard({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="glass-card rounded-2xl p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-5">
-            <SectionHeader eyebrow="S1-D-01" title="30-District Heatmap" detail="Click any district to open S1-D-02 drilldown with blocks and LACs." />
+            <SectionHeader eyebrow="" title="30-District Heatmap" detail="Click any district to open the District Drilldown with blocks and LACs." />
             <div className="hidden md:flex items-center gap-3 text-xs text-slate-600">
               {Object.values(bandStyles).map((style) => (
                 <span key={style.label} className="flex items-center gap-1">
@@ -328,7 +326,7 @@ function StateDashboard({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="glass-card rounded-2xl p-6 lg:col-span-2">
-          <SectionHeader eyebrow="S1-D-01" title="Dose Utilisation % vs Target" detail="District-wise monthly AI dose usage against target." />
+          <SectionHeader eyebrow="" title="Dose Utilisation % vs Target" detail="District-wise monthly AI dose usage against target." />
           <div style={{ width: '100%', height: 360 }}>
             <ResponsiveContainer>
               <BarChart data={utilizationData} margin={{ top: 10, right: 10, left: -20, bottom: 80 }}>
@@ -347,7 +345,7 @@ function StateDashboard({
         </div>
 
         <div className="glass-card rounded-2xl p-6">
-          <SectionHeader eyebrow="S1-D-01" title="Data Updation Compliance" detail="Districts not reporting today." />
+          <SectionHeader eyebrow="" title="Data Updation Compliance" detail="Districts not reporting today." />
           <div className="space-y-3">
             {nonReportingDistricts.map((district) => (
               <div key={district.id} className="flex items-center justify-between p-3 rounded-xl bg-white/60 border border-white/30">
@@ -374,7 +372,7 @@ function DistrictDrilldown({ districts, selectedDistrictName, onSelectedDistrict
     <div className="space-y-6">
       <div className="glass-card rounded-2xl p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <SectionHeader eyebrow="S1-D-02" title="District Inventory Drilldown" detail="Blocks and LACs under selected district with live stock status." />
+          <SectionHeader eyebrow="" title="District Inventory Drilldown" detail="Blocks and LACs under selected district with live stock status." />
           <select value={district.name} onChange={(event) => onSelectedDistrictChange(event.target.value)} className="px-4 py-2.5 rounded-xl bg-white/70 border border-white/30 text-sm">
             {districts.map((item) => <option key={item.id}>{item.name}</option>)}
           </select>
@@ -454,42 +452,88 @@ function AllocationScreen({ districts, onDistrictsChange }: { districts: Distric
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="glass-card rounded-2xl p-6 lg:col-span-2">
-        <SectionHeader eyebrow="S1-D-03" title="Semen Allocation to Districts" detail="Allocate state FSB stock with pickup slot. Submit updates district inventory instantly." />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <label className="space-y-2 text-sm text-slate-700">District
-            <select value={districtName} onChange={(event) => setDistrictName(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-white/30">
-              {districts.map((item) => <option key={item.id}>{item.name}</option>)}
-            </select>
-          </label>
-          <label className="space-y-2 text-sm text-slate-700">Semen type
-            <select value={semenType} onChange={(event) => setSemenType(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-white/30">
-              {semenTypes.map((item) => <option key={item}>{item}</option>)}
-            </select>
-          </label>
-          <label className="space-y-2 text-sm text-slate-700">Animal type
-            <select value={animalType} onChange={(event) => setAnimalType(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-white/30">
-              {animalTypes.map((item) => <option key={item}>{item}</option>)}
-            </select>
-          </label>
-          <label className="space-y-2 text-sm text-slate-700">Quantity mode
-            <select value={mode} onChange={(event) => setMode(event.target.value as 'numbers' | 'percent')} className="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-white/30">
-              <option value="numbers">Numbers</option>
-              <option value="percent">% of FSB stock</option>
-            </select>
-          </label>
-          <label className="space-y-2 text-sm text-slate-700">Quantity
-            <input type="number" min="1" value={quantity} onChange={(event) => setQuantity(Number(event.target.value))} className="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-white/30" />
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <label className="space-y-2 text-sm text-slate-700">Pickup date
-              <input type="date" value={pickupDate} onChange={(event) => setPickupDate(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-white/30" />
-            </label>
-            <label className="space-y-2 text-sm text-slate-700">Pickup time
-              <input type="time" value={pickupTime} onChange={(event) => setPickupTime(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-white/30" />
-            </label>
+        <SectionHeader eyebrow="" title="Semen Allocation to Districts" detail="Allocate state FSB stock with pickup slot. Submit updates district inventory instantly." />
+        
+        <div className="space-y-6 mt-6">
+          {/* District & Semen Selection */}
+          <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200">
+            <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <MapPin size={16} className="text-blue-700" />
+              District & Stock Selection
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="space-y-2 text-sm">
+                <span className="text-slate-700 font-semibold">District</span>
+                <select value={districtName} onChange={(event) => setDistrictName(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white border border-blue-300 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  {districts.map((item) => <option key={item.id}>{item.name}</option>)}
+                </select>
+                <p className="text-xs text-slate-600">Select target district for allocation</p>
+              </label>
+              <label className="space-y-2 text-sm">
+                <span className="text-slate-700 font-semibold">Semen type</span>
+                <select value={semenType} onChange={(event) => setSemenType(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white border border-blue-300 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  {semenTypes.map((item) => <option key={item}>{item}</option>)}
+                </select>
+                <p className="text-xs text-slate-600">Normal or sex sorted doses</p>
+              </label>
+              <label className="space-y-2 text-sm">
+                <span className="text-slate-700 font-semibold">Animal type</span>
+                <select value={animalType} onChange={(event) => setAnimalType(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white border border-blue-300 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  {animalTypes.map((item) => <option key={item}>{item}</option>)}
+                </select>
+                <p className="text-xs text-slate-600">Cattle or buffalo breeds</p>
+              </label>
+            </div>
+          </div>
+
+          {/* Quantity Details */}
+          <div className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200">
+            <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <Syringe size={16} className="text-amber-700" />
+              Quantity Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="space-y-2 text-sm">
+                <span className="text-slate-700 font-semibold">Quantity mode</span>
+                <select value={mode} onChange={(event) => setMode(event.target.value as 'numbers' | 'percent')} className="w-full px-4 py-2.5 rounded-xl bg-white border border-amber-300 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500">
+                  <option value="numbers">Absolute Numbers</option>
+                  <option value="percent">% of FSB stock</option>
+                </select>
+                <p className="text-xs text-slate-600">Choose how to specify quantity</p>
+              </label>
+              <label className="space-y-2 text-sm">
+                <span className="text-slate-700 font-semibold">Quantity</span>
+                <div className="flex items-center gap-2">
+                  <input type="number" min="1" value={quantity} onChange={(event) => setQuantity(Number(event.target.value))} className="flex-1 px-4 py-2.5 rounded-xl bg-white border border-amber-300 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                  <span className="px-3 py-2.5 rounded-xl bg-amber-100 text-amber-900 font-semibold text-sm whitespace-nowrap">{mode === 'percent' ? `${quantity}%` : formatNumber(allocationQty)}</span>
+                </div>
+                <p className="text-xs text-slate-600">FSB total: {formatNumber(fsbStock)} doses</p>
+              </label>
+            </div>
+          </div>
+
+          {/* Pickup Schedule */}
+          <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200">
+            <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <CalendarClock size={16} className="text-purple-700" />
+              Pickup Schedule
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="space-y-2 text-sm">
+                <span className="text-slate-700 font-semibold">Pickup date</span>
+                <input type="date" value={pickupDate} onChange={(event) => setPickupDate(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white border border-purple-300 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                <p className="text-xs text-slate-600">When to pick up the stock</p>
+              </label>
+              <label className="space-y-2 text-sm">
+                <span className="text-slate-700 font-semibold">Pickup time</span>
+                <input type="time" value={pickupTime} onChange={(event) => setPickupTime(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white border border-purple-300 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                <p className="text-xs text-slate-600">Preferred pickup time slot</p>
+              </label>
+            </div>
           </div>
         </div>
-        <button onClick={submitAllocation} className="mt-5 px-5 py-3 rounded-xl bg-green-600 text-white shadow-lg flex items-center gap-2 button-press">
+
+        <button onClick={submitAllocation} className="mt-6 w-full px-8 py-3 rounded-xl bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg flex items-center justify-center gap-2 button-press font-semibold hover:shadow-xl transition-all">
           <Send size={18} />
           Submit Allocation
         </button>
@@ -497,16 +541,27 @@ function AllocationScreen({ districts, onDistrictsChange }: { districts: Distric
       </div>
 
       <div className="glass-card rounded-2xl p-6">
-        <SectionHeader eyebrow="DEMO CRITICAL" title="Live Inventory Preview" detail="Show stock rising immediately after submit." />
+        <SectionHeader eyebrow="PREVIEW" title="Live Inventory Impact" detail="Real-time stock change preview" />
         <div className="space-y-4">
-          <div className="p-4 rounded-xl bg-white/60 border border-white/30">
-            <p className="text-sm text-slate-600">Current district stock</p>
-            <p className="text-3xl font-mono text-slate-900">{formatNumber(district.stock)}</p>
+          <div>
+            <p className="text-xs text-slate-600 uppercase font-semibold mb-2">Current Stock</p>
+            <div className="p-4 rounded-xl bg-white/60 border border-white/30">
+              <p className="text-3xl font-bold text-slate-900">{formatNumber(district.stock)}</p>
+              <p className="text-xs text-slate-600 mt-1">{district.name}</p>
+            </div>
           </div>
-          <div className="p-4 rounded-xl bg-green-50 border border-green-200">
-            <p className="text-sm text-green-700">After allocation</p>
-            <p className="text-3xl font-mono text-green-800">{formatNumber(district.stock + allocationQty)}</p>
-            <p className="text-xs text-green-700 mt-1">Pickup: {pickupDate} at {pickupTime}</p>
+          <div className="flex items-center justify-center">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-green-100 text-green-700 font-semibold text-sm">
+              <Send size={14} />
+              +{formatNumber(allocationQty)}
+            </div>
+          </div>
+          <div>
+            <p className="text-xs text-slate-600 uppercase font-semibold mb-2">After Allocation</p>
+            <div className="p-4 rounded-xl bg-green-50 border border-green-300">
+              <p className="text-3xl font-bold text-green-800">{formatNumber(district.stock + allocationQty)}</p>
+              <p className="text-xs text-green-700 mt-1">Pickup: {pickupDate} @ {pickupTime}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -535,55 +590,162 @@ function RedistributionScreen({ districts, onDistrictsChange }: { districts: Dis
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="glass-card rounded-2xl p-6 lg:col-span-2">
-        <SectionHeader eyebrow="S1-D-04" title="Redistribution Between Districts" detail="Move surplus stock from donor districts to deficit districts." />
-        <div className="p-4 rounded-xl bg-green-50 border border-green-200 mb-5 flex items-start gap-3">
-          <Sparkles className="text-green-700 mt-0.5" size={20} />
+        <SectionHeader eyebrow="" title="Redistribution Between Districts" detail="Move surplus stock from donor districts to deficit districts." />
+        
+        {/* AI Suggestion */}
+        <div className="p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-300 mb-6 flex items-start gap-3">
+          <Sparkles className="text-green-700 mt-0.5 flex-shrink-0" size={20} />
           <div>
-            <p className="text-sm font-semibold text-green-900">AI suggestion: Balasore has 800 surplus - recommend sending 400 doses to Cuttack.</p>
-            <p className="text-xs text-green-700 mt-1">This is the smart allocation optimizer moment for the demo.</p>
+            <p className="text-sm font-semibold text-green-900">💡 AI Recommendation</p>
+            <p className="text-sm text-green-800 mt-1">Balasore has 800 doses surplus. Transfer 400 doses to Cuttack to optimize utilization.</p>
+            <p className="text-xs text-green-700 mt-1">Smart allocation based on inventory analysis</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <label className="space-y-2 text-sm text-slate-700">Donor district
-            <select value={donorName} onChange={(event) => setDonorName(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-white/30">
-              {districts.map((item) => <option key={item.id}>{item.name}</option>)}
-            </select>
-          </label>
-          <label className="space-y-2 text-sm text-slate-700">Recipient district
-            <select value={recipientName} onChange={(event) => setRecipientName(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-white/30">
-              {districts.map((item) => <option key={item.id}>{item.name}</option>)}
-            </select>
-          </label>
-          <label className="space-y-2 text-sm text-slate-700">Quantity mode
-            <select value={mode} onChange={(event) => setMode(event.target.value as 'numbers' | 'percent')} className="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-white/30">
-              <option value="numbers">Numbers</option>
-              <option value="percent">% of donor stock</option>
-            </select>
-          </label>
-          <label className="space-y-2 text-sm text-slate-700">Quantity
-            <input type="number" min="1" value={quantity} onChange={(event) => setQuantity(Number(event.target.value))} className="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-white/30" />
-          </label>
+
+        <div className="space-y-6">
+          {/* Donor District */}
+          <div className="p-4 rounded-xl bg-gradient-to-br from-red-50 to-orange-50 border border-red-200">
+            <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <TrendingUp size={16} className="text-red-700" />
+              Donor District (Surplus Stock)
+            </h3>
+            <label className="space-y-2 text-sm">
+              <span className="text-slate-700 font-semibold">Select donor</span>
+              <select value={donorName} onChange={(event) => setDonorName(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white border border-red-300 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-red-500">
+                {districts.map((item) => <option key={item.id}>{item.name}</option>)}
+              </select>
+              <p className="text-xs text-slate-600">District with surplus stock to transfer</p>
+            </label>
+            {donor && (
+              <div className="mt-3 p-3 rounded-lg bg-white/60 border border-red-200">
+                <p className="text-xs text-slate-600">Available stock</p>
+                <p className="text-xl font-bold text-red-700">{formatNumber(donor.stock)}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Flow Indicator */}
+          <div className="flex items-center justify-center">
+            <div className="flex items-center gap-3 px-4 py-3 rounded-full bg-gradient-to-r from-slate-100 to-slate-200 border border-slate-300">
+              <ArrowRightLeft size={18} className="text-slate-700" />
+              <span className="text-sm font-semibold text-slate-700">Transfer</span>
+            </div>
+          </div>
+
+          {/* Recipient District */}
+          <div className="p-4 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200">
+            <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <TrendingUp size={16} className="text-green-700" />
+              Recipient District (Deficit Stock)
+            </h3>
+            <label className="space-y-2 text-sm">
+              <span className="text-slate-700 font-semibold">Select recipient</span>
+              <select value={recipientName} onChange={(event) => setRecipientName(event.target.value)} className="w-full px-4 py-2.5 rounded-xl bg-white border border-green-300 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-green-500">
+                {districts.map((item) => <option key={item.id}>{item.name}</option>)}
+              </select>
+              <p className="text-xs text-slate-600">District with deficit stock to receive doses</p>
+            </label>
+            {recipient && (
+              <div className="mt-3 p-3 rounded-lg bg-white/60 border border-green-200">
+                <p className="text-xs text-slate-600">Current stock</p>
+                <p className="text-xl font-bold text-green-700">{formatNumber(recipient.stock)}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Transfer Details */}
+          <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200">
+            <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <Syringe size={16} className="text-blue-700" />
+              Transfer Quantity
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="space-y-2 text-sm">
+                <span className="text-slate-700 font-semibold">Quantity mode</span>
+                <select value={mode} onChange={(event) => setMode(event.target.value as 'numbers' | 'percent')} className="w-full px-4 py-2.5 rounded-xl bg-white border border-blue-300 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option value="numbers">Absolute Numbers</option>
+                  <option value="percent">% of donor stock</option>
+                </select>
+                <p className="text-xs text-slate-600">How to specify quantity</p>
+              </label>
+              <label className="space-y-2 text-sm">
+                <span className="text-slate-700 font-semibold">Quantity</span>
+                <div className="flex items-center gap-2">
+                  <input type="number" min="1" value={quantity} onChange={(event) => setQuantity(Number(event.target.value))} className="flex-1 px-4 py-2.5 rounded-xl bg-white border border-blue-300 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <span className="px-3 py-2.5 rounded-xl bg-blue-100 text-blue-900 font-semibold text-sm whitespace-nowrap">{mode === 'percent' ? `${quantity}%` : formatNumber(transferQty)}</span>
+                </div>
+                <p className="text-xs text-slate-600">Max available: {formatNumber(donor.stock)}</p>
+              </label>
+            </div>
+          </div>
+
+          {/* Pickup Options */}
+          <div className="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200">
+            <label className="flex items-center gap-3 text-sm cursor-pointer">
+              <input type="checkbox" checked={multiSlot} onChange={(event) => setMultiSlot(event.target.checked)} className="w-4 h-4 rounded border-purple-300 text-purple-600 cursor-pointer" />
+              <div>
+                <span className="font-semibold text-slate-900">Split pickup into multiple slots</span>
+                <p className="text-xs text-slate-600 mt-0.5">Distribute transfer across 3 pickup times (10:00, 13:00, 16:00)</p>
+              </div>
+            </label>
+          </div>
         </div>
-        <label className="mt-4 flex items-center gap-2 text-sm text-slate-700">
-          <input type="checkbox" checked={multiSlot} onChange={(event) => setMultiSlot(event.target.checked)} className="w-4 h-4" />
-          Split pickup into multiple slots
-        </label>
-        <button onClick={confirm} className="mt-5 px-5 py-3 rounded-xl bg-green-600 text-white shadow-lg flex items-center gap-2 button-press">
+
+        <button onClick={confirm} className="mt-6 w-full px-8 py-3 rounded-xl bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg flex items-center justify-center gap-2 button-press font-semibold hover:shadow-xl transition-all">
           <ArrowRightLeft size={18} />
           Confirm Redistribution
         </button>
         {message && <div className="mt-4 p-4 rounded-xl bg-green-50 border border-green-200 text-sm text-green-800">{message}</div>}
       </div>
+
       <div className="glass-card rounded-2xl p-6">
-        <SectionHeader eyebrow="LIVE BALANCE" title="Before and After" detail={multiSlot ? 'Pickup slots: 10:00, 13:00, 16:00' : 'Pickup slot: 10:00'} />
-        <div className="space-y-3">
-          <div className="p-4 rounded-xl bg-white/60 border border-white/30">
-            <p className="text-sm text-slate-700">{donor.name}</p>
-            <p className="font-mono text-xl text-red-700">{formatNumber(donor.stock)} {'->'} {formatNumber(Math.max(0, donor.stock - transferQty))}</p>
+        <SectionHeader eyebrow="LIVE BALANCE" title="Before & After Impact" detail={multiSlot ? 'Pickup slots: 10:00, 13:00, 16:00' : 'Single pickup slot'} />
+        
+        <div className="space-y-4">
+          {/* Donor Changes */}
+          <div>
+            <p className="text-xs text-slate-600 uppercase font-semibold mb-2 flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-red-500"></span>
+              {donor.name} (Donor)
+            </p>
+            <div className="p-4 rounded-xl bg-red-50 border border-red-200">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-slate-700">Before</span>
+                <span className="font-bold text-red-800">{formatNumber(donor.stock)}</span>
+              </div>
+              <div className="flex items-center gap-2 my-2">
+                <div className="flex-1 h-0.5 bg-red-300"></div>
+                <span className="text-xs text-red-600 font-semibold">-{formatNumber(transferQty)}</span>
+                <div className="flex-1 h-0.5 bg-red-300"></div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-700">After</span>
+                <span className="font-bold text-red-800">{formatNumber(Math.max(0, donor.stock - transferQty))}</span>
+              </div>
+            </div>
           </div>
-          <div className="p-4 rounded-xl bg-white/60 border border-white/30">
-            <p className="text-sm text-slate-700">{recipient.name}</p>
-            <p className="font-mono text-xl text-green-700">{formatNumber(recipient.stock)} {'->'} {formatNumber(recipient.stock + transferQty)}</p>
+
+          {/* Recipient Changes */}
+          <div>
+            <p className="text-xs text-slate-600 uppercase font-semibold mb-2 flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-green-500"></span>
+              {recipient.name} (Recipient)
+            </p>
+            <div className="p-4 rounded-xl bg-green-50 border border-green-200">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-slate-700">Before</span>
+                <span className="font-bold text-green-800">{formatNumber(recipient.stock)}</span>
+              </div>
+              <div className="flex items-center gap-2 my-2">
+                <div className="flex-1 h-0.5 bg-green-300"></div>
+                <span className="text-xs text-green-600 font-semibold">+{formatNumber(transferQty)}</span>
+                <div className="flex-1 h-0.5 bg-green-300"></div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-slate-700">After</span>
+                <span className="font-bold text-green-800">{formatNumber(recipient.stock + transferQty)}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -608,7 +770,7 @@ function RequestManagement() {
       </div>
       <div className="glass-card rounded-2xl p-6">
         <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
-          <SectionHeader eyebrow="S1-D-05" title="Restocking Request Management" detail="Sortable by urgency with approve, reject, procurement, and fulfilment actions." />
+          <SectionHeader eyebrow="" title="Restocking Request Management" detail="Sortable by urgency with approve, reject, procurement, and fulfilment actions." />
           <select value={vendor} onChange={(event) => setVendor(event.target.value)} className="px-4 py-2.5 rounded-xl bg-white/70 border border-white/30 text-sm">
             {vendors.map((item) => <option key={item}>{item}</option>)}
           </select>
@@ -656,6 +818,11 @@ function RequestManagement() {
 }
 
 function ReportsScreen({ districts }: { districts: DistrictSemen[] }) {
+  const [semenTypeFilter, setSemenTypeFilter] = useState('Normal + Sex Sorted');
+  const [animalTypeFilter, setAnimalTypeFilter] = useState('Cattle + Buffalo');
+  const [dateFilter, setDateFilter] = useState('2026-05-01');
+  const [sortBy, setSortBy] = useState<'district' | 'utilisation' | 'stock' | 'daysToStockout'>('district');
+  
   const data = districts.slice(0, 12).map((district) => ({
     district: district.name,
     utilisation: Math.round((district.used / district.target) * 100),
@@ -663,15 +830,94 @@ function ReportsScreen({ districts }: { districts: DistrictSemen[] }) {
     compliance: district.reporting ? 96 : 44,
   }));
 
+  const tableData = [...districts].sort((a, b) => {
+    switch (sortBy) {
+      case 'utilisation':
+        return (b.used / b.target) - (a.used / a.target);
+      case 'stock':
+        return b.stock - a.stock;
+      case 'daysToStockout':
+        return (a.daysToStockout ?? 45) - (b.daysToStockout ?? 45);
+      default:
+        return a.name.localeCompare(b.name);
+    }
+  });
+
   return (
     <div className="space-y-6">
       <div className="glass-card rounded-2xl p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <SectionHeader eyebrow="S1-D-06" title="Analytics & Reports" detail="Filterable reports for semen type, animal type, date range, and level." />
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
+          <SectionHeader eyebrow="" title="Analytics & Reports" detail="Filterable reports for semen type, animal type, date range, and level." />
           <div className="flex flex-wrap gap-2">
-            <select className="px-3 py-2 rounded-xl bg-white/70 border border-white/30 text-sm"><option>Normal + Sex Sorted</option><option>Normal</option><option>Sex Sorted</option></select>
-            <select className="px-3 py-2 rounded-xl bg-white/70 border border-white/30 text-sm"><option>Cattle + Buffalo</option><option>Cattle</option><option>Buffalo</option></select>
-            <input type="date" defaultValue="2026-05-01" className="px-3 py-2 rounded-xl bg-white/70 border border-white/30 text-sm" />
+            <select value={semenTypeFilter} onChange={(e) => setSemenTypeFilter(e.target.value)} className="px-3 py-2 rounded-xl bg-white/70 border border-white/30 text-sm"><option>Normal + Sex Sorted</option><option>Normal</option><option>Sex Sorted</option></select>
+            <select value={animalTypeFilter} onChange={(e) => setAnimalTypeFilter(e.target.value)} className="px-3 py-2 rounded-xl bg-white/70 border border-white/30 text-sm"><option>Cattle + Buffalo</option><option>Cattle</option><option>Buffalo</option></select>
+            <input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="px-3 py-2 rounded-xl bg-white/70 border border-white/30 text-sm" />
+          </div>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[1200px]">
+            <thead>
+              <tr className="text-left text-sm text-slate-600 font-semibold border-b-2 border-white/40">
+                <th className="py-3 px-4">District</th>
+                <th className="py-3 px-4 text-right">Current Stock</th>
+                <th className="py-3 px-4 text-right">Allocated</th>
+                <th className="py-3 px-4 text-right">Used</th>
+                <th className="py-3 px-4 text-right">Target</th>
+                <th className="py-3 px-4 text-center">Utilisation %</th>
+                <th className="py-3 px-4 text-right">Days to Stockout</th>
+                <th className="py-3 px-4">Blocks</th>
+                <th className="py-3 px-4">LACs</th>
+                <th className="py-3 px-4 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableData.map((district) => {
+                const utilisationPct = Math.round((district.used / district.target) * 100);
+                const stockRatio = district.stock / district.allocated;
+                const statusColor = district.reporting ? 'text-green-700 bg-green-50' : 'text-red-700 bg-red-50';
+                const utilisationStyle = utilisationPct >= 90 ? 'text-green-700 bg-green-50' : utilisationPct >= 75 ? 'text-amber-700 bg-amber-50' : 'text-red-700 bg-red-50';
+                const daysStyle = (district.daysToStockout ?? 45) <= 14 ? 'text-red-700 bg-red-50' : (district.daysToStockout ?? 45) <= 28 ? 'text-amber-700 bg-amber-50' : 'text-green-700 bg-green-50';
+                
+                return (
+                  <tr key={district.id} className="border-b border-white/20 hover:bg-white/40 transition-colors">
+                    <td className="py-3 px-4 text-sm font-semibold text-slate-900">{district.name}</td>
+                    <td className="py-3 px-4 text-sm font-mono text-slate-700">{formatNumber(district.stock)}</td>
+                    <td className="py-3 px-4 text-sm font-mono text-slate-700">{formatNumber(district.allocated)}</td>
+                    <td className="py-3 px-4 text-sm font-mono text-slate-700">{formatNumber(district.used)}</td>
+                    <td className="py-3 px-4 text-sm font-mono text-slate-700">{formatNumber(district.target)}</td>
+                    <td className="py-3 px-4 text-center"><span className={`px-3 py-1 rounded-full text-sm font-semibold ${utilisationStyle}`}>{utilisationPct}%</span></td>
+                    <td className="py-3 px-4 text-right"><span className={`px-3 py-1 rounded-full text-sm font-semibold ${daysStyle}`}>{district.daysToStockout ?? '∞'}</span></td>
+                    <td className="py-3 px-4 text-sm text-slate-700">{district.blocks}</td>
+                    <td className="py-3 px-4 text-sm text-slate-700">{district.lacs}</td>
+                    <td className="py-3 px-4 text-center"><span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColor}`}>{district.reporting ? 'Reporting' : 'Pending'}</span></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6 pt-4 border-t border-white/30">
+          <div className="p-4 rounded-xl bg-white/50 border border-white/30">
+            <p className="text-xs text-slate-600 mb-1">Total Stock (All Districts)</p>
+            <p className="text-2xl font-bold text-slate-900">{formatNumber(tableData.reduce((sum, d) => sum + d.stock, 0))}</p>
+            <p className="text-xs text-slate-500 mt-1">Across all 30 districts</p>
+          </div>
+          <div className="p-4 rounded-xl bg-white/50 border border-white/30">
+            <p className="text-xs text-slate-600 mb-1">Avg Utilisation Rate</p>
+            <p className="text-2xl font-bold text-slate-900">{Math.round(tableData.reduce((sum, d) => sum + (d.used / d.target * 100), 0) / tableData.length)}%</p>
+            <p className="text-xs text-slate-500 mt-1">Across all districts</p>
+          </div>
+          <div className="p-4 rounded-xl bg-white/50 border border-white/30">
+            <p className="text-xs text-slate-600 mb-1">Districts Reporting</p>
+            <p className="text-2xl font-bold text-green-700">{tableData.filter(d => d.reporting).length}/{tableData.length}</p>
+            <p className="text-xs text-slate-500 mt-1">{Math.round(tableData.filter(d => d.reporting).length / tableData.length * 100)}% active</p>
+          </div>
+          <div className="p-4 rounded-xl bg-white/50 border border-white/30">
+            <p className="text-xs text-slate-600 mb-1">Critical (Days to Stockout ≤ 14)</p>
+            <p className="text-2xl font-bold text-red-700">{tableData.filter(d => (d.daysToStockout ?? 45) <= 14).length}</p>
+            <p className="text-xs text-slate-500 mt-1">Immediate action needed</p>
           </div>
         </div>
       </div>
@@ -745,7 +991,7 @@ function ForecastingScreen({ districts }: { districts: DistrictSemen[] }) {
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="glass-card rounded-2xl p-6 lg:col-span-2">
-          <SectionHeader eyebrow="S1-D-07" title="ARIMA Demand Forecast" detail="Predicted demand by district for the next 3 months." />
+          <SectionHeader eyebrow="" title="ARIMA Demand Forecast" detail="Predicted demand by district for the next 3 months." />
           <ResponsiveContainer width="100%" height={330}>
             <LineChart data={forecastData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -878,7 +1124,7 @@ function BlockAllocation({ blocks }: { blocks: ReturnType<typeof makeBlocks> }) 
         <input type="number" defaultValue={120} className="px-4 py-2.5 rounded-xl bg-white/70 border border-white/30" />
         <input type="datetime-local" defaultValue="2026-05-25T11:00" className="px-4 py-2.5 rounded-xl bg-white/70 border border-white/30" />
       </div>
-      <button className="mt-5 px-5 py-3 rounded-xl bg-green-600 text-white">Submit Block Allocation</button>
+      <button className="mt-5 px-8 py-3 rounded-xl bg-green-600 text-white">Submit Block Allocation</button>
     </div>
   );
 }

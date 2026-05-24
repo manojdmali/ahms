@@ -21,6 +21,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { GovernmentScheme } from '../../data/governmentSchemesData';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface SchemeDetailProps {
   scheme: GovernmentScheme;
@@ -136,10 +137,7 @@ export function SchemeDetail({ scheme, onBack }: SchemeDetailProps) {
                 <Calendar size={16} />
                 <div>
                   <p className="text-xs text-slate-500">Launched</p>
-                  <p className="text-slate-900">{new Date(scheme.launchedDate).toLocaleDateString('en-IN', { 
-                    month: 'short', 
-                    year: 'numeric' 
-                  })}</p>
+                  <p className="text-slate-900">{formatDisplayDate(scheme.launchedDate)}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-sm text-slate-600">
@@ -206,7 +204,7 @@ export function SchemeDetail({ scheme, onBack }: SchemeDetailProps) {
               <span className="text-sm text-slate-600">Deadline</span>
             </div>
             <p className="text-2xl text-slate-900 mb-1">
-              {new Date(scheme.applicationDeadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+              {formatDisplayDate(scheme.applicationDeadline)}
             </p>
             <p className="text-xs text-amber-600">Apply before</p>
           </div>
@@ -454,11 +452,7 @@ export function SchemeDetail({ scheme, onBack }: SchemeDetailProps) {
 
       {/* Last Updated */}
       <div className="text-center text-sm text-slate-500">
-        Last updated: {new Date(scheme.lastUpdated).toLocaleDateString('en-IN', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric'
-        })}
+        Last updated: {formatDisplayDate(scheme.lastUpdated)}
       </div>
     </motion.div>
   );

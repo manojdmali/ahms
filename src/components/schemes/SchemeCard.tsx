@@ -10,6 +10,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface SchemeCardProps {
   schemeId: string;
@@ -140,11 +141,7 @@ export function SchemeCard({
             <div>
               <p className="text-xs text-amber-700">{t('Application Deadline', 'आवेदन की अंतिम तिथि', 'ଆବେଦନ ଶେଷ ତାରିଖ')}</p>
               <p className="text-sm font-medium text-amber-900">
-                {new Date(applicationDeadline).toLocaleDateString('en-IN', {
-                  day: 'numeric',
-                  month: 'short',
-                  year: 'numeric'
-                })}
+                {formatDisplayDate(applicationDeadline)}
               </p>
             </div>
           </div>

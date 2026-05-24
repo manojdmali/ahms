@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Calendar, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 import { motion } from 'motion/react';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface PregnancyRecord {
   id: string;
@@ -161,12 +162,12 @@ export function PregnancyTracker() {
                   <div className="flex items-center gap-4 text-sm text-slate-600">
                     <span className="flex items-center gap-1">
                       <Calendar size={14} />
-                      AI: {record.aiDate.toLocaleDateString()}
+                      AI: {formatDisplayDate(record.aiDate)}
                     </span>
                     {record.pregnancyConfirmed && (
                       <span className="flex items-center gap-1">
                         <CheckCircle size={14} />
-                        Confirmed: {record.confirmationDate?.toLocaleDateString()}
+                        Confirmed: {formatDisplayDate(record.confirmationDate)}
                       </span>
                     )}
                   </div>
@@ -175,7 +176,7 @@ export function PregnancyTracker() {
                 <div className="text-right">
                   <p className="text-sm text-slate-600 mb-1">Expected Calving</p>
                   <p className="text-slate-900 font-mono mb-1">
-                    {record.expectedCalvingDate.toLocaleDateString()}
+                    {formatDisplayDate(record.expectedCalvingDate)}
                   </p>
                   <p className={`text-sm font-mono ${daysUntil <= 30 ? 'text-red-600' : 'text-green-600'}`}>
                     {daysUntil > 0 ? `${daysUntil} days remaining` : 'Overdue'}

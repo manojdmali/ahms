@@ -15,7 +15,7 @@ export function SystemPreferences() {
   const [preferences, setPreferences] = useState({
     language: 'english',
     theme: 'system',
-    dateFormat: 'DD/MM/YYYY',
+    dateFormat: 'DD-MM-YYYY',
     timeFormat: '24h',
     currency: 'INR',
     numberFormat: 'indian',
@@ -173,7 +173,7 @@ export function SystemPreferences() {
               onChange={(e) => setPreferences({ ...preferences, dateFormat: e.target.value })}
               className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-green-500"
             >
-              <option value="DD/MM/YYYY">DD/MM/YYYY (02/12/2024)</option>
+              <option value="DD-MM-YYYY">DD-MM-YYYY (02-12-2024)</option>
               <option value="MM/DD/YYYY">MM/DD/YYYY (12/02/2024)</option>
               <option value="YYYY-MM-DD">YYYY-MM-DD (2024-12-02)</option>
               <option value="DD MMM YYYY">DD MMM YYYY (02 Dec 2024)</option>

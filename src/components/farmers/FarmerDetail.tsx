@@ -18,6 +18,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { AddAnimalModal } from './AddAnimalModal';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface FarmerDetailProps {
   farmer: any;
@@ -111,7 +112,7 @@ export function FarmerDetail({ farmer, onBack }: FarmerDetailProps) {
                 <Calendar size={16} />
                 <div>
                   <p className="text-slate-900">Registered</p>
-                  <p className="text-xs">{new Date(farmer.registrationDate).toLocaleDateString()}</p>
+                  <p className="text-xs">{formatDisplayDate(farmer.registrationDate)}</p>
                 </div>
               </div>
             </div>

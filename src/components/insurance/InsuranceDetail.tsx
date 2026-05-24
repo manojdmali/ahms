@@ -23,6 +23,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Insurance } from '../../data/insuranceData';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface InsuranceDetailProps {
   insurance: Insurance;
@@ -437,11 +438,7 @@ export function InsuranceDetail({ insurance, onBack }: InsuranceDetailProps) {
 
       {/* Last Updated */}
       <div className="text-center text-xs sm:text-sm text-slate-500">
-        Last updated: {new Date(insurance.lastUpdated).toLocaleDateString('en-IN', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric'
-        })}
+        Last updated: {formatDisplayDate(insurance.lastUpdated)}
       </div>
     </motion.div>
   );

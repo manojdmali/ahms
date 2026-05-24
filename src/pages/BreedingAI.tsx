@@ -6,6 +6,7 @@ import { PregnancyTracker } from '../components/breeding/PregnancyTracker';
 import { SemenInventory } from '../components/breeding/SemenInventory';
 import { BreedingAnalytics } from '../components/breeding/BreedingAnalytics';
 import { useLanguage } from '../contexts/LanguageContext';
+import { formatDisplayDate } from '../utils/dateFormat';
 
 type ViewMode = 'overview' | 'pregnancy' | 'inventory' | 'analytics';
 
@@ -300,10 +301,10 @@ export default function BreedingAI() {
               <h3 className="text-slate-800 mb-4">{t('Upcoming Pregnancy Checks', 'आगामी गर्भावस्था जांच', 'ଆଗାମୀ ଗର୍ଭଧାରଣ ଯାଞ୍ଚ')}</h3>
               <div className="space-y-3">
                 {[
-                  { tag: 'OD-KHD-001230', daysLeft: 2, aiDate: 'Nov 18, 2024' },
-                  { tag: 'OD-KHD-001231', daysLeft: 5, aiDate: 'Nov 21, 2024' },
-                  { tag: 'OD-KHD-001232', daysLeft: 8, aiDate: 'Nov 24, 2024' },
-                  { tag: 'OD-KHD-001233', daysLeft: 12, aiDate: 'Nov 28, 2024' }
+                  { tag: 'OD-KHD-001230', daysLeft: 2, aiDate: '2024-11-18' },
+                  { tag: 'OD-KHD-001231', daysLeft: 5, aiDate: '2024-11-21' },
+                  { tag: 'OD-KHD-001232', daysLeft: 8, aiDate: '2024-11-24' },
+                  { tag: 'OD-KHD-001233', daysLeft: 12, aiDate: '2024-11-28' }
                 ].map((check, index) => (
                   <div
                     key={index}
@@ -311,7 +312,7 @@ export default function BreedingAI() {
                   >
                     <div>
                       <p className="text-sm text-slate-900 font-mono mb-1">{check.tag}</p>
-                      <p className="text-xs text-slate-600">AI: {check.aiDate}</p>
+                      <p className="text-xs text-slate-600">AI: {formatDisplayDate(check.aiDate)}</p>
                     </div>
                     <div className="text-right">
                       <p className={`text-sm font-mono ${check.daysLeft <= 3 ? 'text-red-600' : 'text-amber-600'}`}>

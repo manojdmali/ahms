@@ -6,6 +6,7 @@ import { ReportCard } from '../components/reports/ReportCard';
 import { ReportDetail } from '../components/reports/ReportDetail';
 import { reportsData, reportCategories, Report as ReportType } from '../data/reportsData';
 import { useLanguage } from '../contexts/LanguageContext';
+import { formatDisplayDate } from '../utils/dateFormat';
 
 export default function Reports() {
   const { t } = useLanguage();
@@ -299,7 +300,7 @@ export default function Reports() {
                     <td className="px-4 py-3"><span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full capitalize">{r.category}</span></td>
                     <td className="px-4 py-3"><span className="text-xs px-2 py-0.5 bg-purple-50 text-purple-700 rounded-full capitalize">{r.type}</span></td>
                     <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{r.period}</td>
-                    <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{r.generatedDate}</td>
+                    <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{formatDisplayDate(r.generatedDate)}</td>
                     <td className="px-4 py-3 font-mono text-sm text-slate-700">{r.downloads.toLocaleString()}</td>
                     <td className="px-4 py-3">
                       <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${

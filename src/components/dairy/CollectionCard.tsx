@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { Droplet, User, Calendar, Clock, Thermometer, TrendingUp, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface CollectionCardProps {
   collectionId: string;
@@ -114,7 +115,7 @@ export function CollectionCard({
         <div>
           <div className="flex items-center gap-2 mb-2">
             <Calendar size={14} className="text-slate-400" />
-            <span className="text-xs text-slate-600">{new Date(date).toLocaleDateString()}</span>
+            <span className="text-xs text-slate-600">{formatDisplayDate(date)}</span>
           </div>
           <div className="flex items-center gap-2">
             <Clock size={14} className="text-slate-400" />

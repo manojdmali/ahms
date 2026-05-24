@@ -19,6 +19,7 @@ import {
   Info
 } from 'lucide-react';
 import { MarketListing } from '../../data/marketData';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface MarketDetailProps {
   listing: MarketListing;
@@ -206,11 +207,7 @@ export function MarketDetail({ listing, onBack }: MarketDetailProps) {
               <p className="text-xs text-slate-600">Listed Date</p>
             </div>
             <p className="text-sm font-medium text-slate-900">
-              {new Date(listing.listedDate).toLocaleDateString('en-IN', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric'
-              })}
+              {formatDisplayDate(listing.listedDate)}
             </p>
           </div>
         </div>

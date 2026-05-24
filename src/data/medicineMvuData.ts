@@ -25,7 +25,7 @@ export interface MedicineRequisition {
   medicine: string;
   quantity: number;
   urgency: MedicineUrgency;
-  status: 'Pending' | 'Approved' | 'Fulfilled';
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Fulfilled';
   submittedAt: string;
 }
 

@@ -15,6 +15,7 @@ import {
   Users
 } from 'lucide-react';
 import { Training } from '../../data/trainingData';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface TrainingRegistrationModalProps {
   isOpen: boolean;
@@ -107,7 +108,7 @@ export function TrainingRegistrationModal({
                     <div>
                       <p className="text-xs text-slate-600">Start Date</p>
                       <p className="text-sm font-medium text-slate-900">
-                        {new Date(training.startDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                        {formatDisplayDate(training.startDate)}
                       </p>
                     </div>
                   </div>
@@ -488,11 +489,7 @@ export function TrainingRegistrationModal({
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-slate-600">Training Start Date:</span>
                       <span className="text-sm font-medium text-slate-900">
-                        {new Date(training.startDate).toLocaleDateString('en-IN', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric'
-                        })}
+                        {formatDisplayDate(training.startDate)}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">

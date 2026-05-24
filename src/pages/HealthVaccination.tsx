@@ -10,6 +10,7 @@ import { ScheduleVaccinationModal } from '../components/health/ScheduleVaccinati
 import { HealthRecordCard } from '../components/health/HealthRecordCard';
 import { HealthRecordDetail } from '../components/health/HealthRecordDetail';
 import { useLanguage } from '../contexts/LanguageContext';
+import { formatDisplayDate } from '../utils/dateFormat';
 
 type ViewMode = 'overview' | 'calendar' | 'records' | 'detail';
 
@@ -547,7 +548,7 @@ export default function HealthVaccination() {
                           }`}>{record.type}</span>
                         </td>
                         <td className="px-4 py-3 text-xs text-slate-600 max-w-[120px] truncate">{record.disease || '—'}</td>
-                        <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{new Date(record.date).toLocaleDateString()}</td>
+                        <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{formatDisplayDate(record.date)}</td>
                         <td className="px-4 py-3">
                           <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ${
                             record.status === 'completed' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'

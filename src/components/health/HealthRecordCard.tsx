@@ -14,6 +14,7 @@ import {
   Thermometer
 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface HealthRecordCardProps {
   recordId: string;
@@ -171,7 +172,7 @@ export function HealthRecordCard({
         <div className="flex items-center gap-2 text-sm">
           <Calendar size={14} className="text-slate-400 flex-shrink-0" />
           <span className="text-slate-700 text-xs sm:text-sm">
-            {new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+            {formatDisplayDate(date)}
           </span>
         </div>
         
@@ -199,7 +200,7 @@ export function HealthRecordCard({
           <Bell size={14} className="text-purple-600 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-xs text-purple-700">
-              {t('Follow-up on', 'अनुवर्ती', 'ଫଲୋ-ଅପ୍')} {new Date(followUpDate).toLocaleDateString()}
+              {t('Follow-up on', 'अनुवर्ती', 'ଫଲୋ-ଅପ୍')} {formatDisplayDate(followUpDate)}
             </p>
           </div>
         </div>
@@ -208,7 +209,7 @@ export function HealthRecordCard({
       {/* Footer */}
       <div className="flex items-center justify-between pt-3 border-t border-slate-200">
         <div className="text-xs text-slate-500">
-          {t('Added', 'जोड़ा गया', 'ଯୋଡ଼ାଗଲା')} {new Date(date).toLocaleDateString()}
+          {t('Added', 'जोड़ा गया', 'ଯୋଡ଼ାଗଲା')} {formatDisplayDate(date)}
         </div>
         <button className="text-green-600 hover:text-green-700 text-sm font-medium">
           {t('View Details', 'विवरण देखें', 'ବିବରଣୀ ଦେଖନ୍ତୁ')} →

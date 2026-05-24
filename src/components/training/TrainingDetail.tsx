@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { Training } from '../../data/trainingData';
 import { TrainingRegistrationModal } from './TrainingRegistrationModal';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 interface TrainingDetailProps {
   training: Training;
@@ -159,11 +160,7 @@ export function TrainingDetail({ training, onBack }: TrainingDetailProps) {
             <div className="p-3 bg-white/50 rounded-xl">
               <p className="text-xs text-slate-600 mb-1">Registration Deadline</p>
               <p className="text-sm font-medium text-slate-900">
-                {new Date(training.registrationDeadline).toLocaleDateString('en-IN', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                })}
+                {formatDisplayDate(training.registrationDeadline)}
               </p>
             </div>
 
@@ -213,22 +210,14 @@ export function TrainingDetail({ training, onBack }: TrainingDetailProps) {
             <div className="p-4 bg-white/50 rounded-xl">
               <p className="text-xs text-slate-600 mb-1">Start Date</p>
               <p className="text-sm font-medium text-slate-900">
-                {new Date(training.startDate).toLocaleDateString('en-IN', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                })}
+                {formatDisplayDate(training.startDate)}
               </p>
             </div>
 
             <div className="p-4 bg-white/50 rounded-xl">
               <p className="text-xs text-slate-600 mb-1">End Date</p>
               <p className="text-sm font-medium text-slate-900">
-                {new Date(training.endDate).toLocaleDateString('en-IN', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric'
-                })}
+                {formatDisplayDate(training.endDate)}
               </p>
             </div>
 

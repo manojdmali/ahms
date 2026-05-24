@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { motion } from 'motion/react';
+import { formatDisplayDate } from '../../utils/dateFormat';
 
 type ViewMode = 'month' | 'week' | 'day';
 
@@ -217,7 +218,7 @@ export function VaccinationCalendar() {
                       {event.type} - {event.location}
                     </p>
                     <p className="text-xs text-slate-600">
-                      {event.date.toLocaleDateString()} • {event.animals} animals
+                      {formatDisplayDate(event.date)} • {event.animals} animals
                     </p>
                   </div>
                 </div>

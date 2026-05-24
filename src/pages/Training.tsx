@@ -7,6 +7,7 @@ import { TrainingDetail } from '../components/training/TrainingDetail';
 import { TrainingRegistrationModal } from '../components/training/TrainingRegistrationModal';
 import { trainingData, trainingCategories, Training as TrainingType } from '../data/trainingData';
 import { useLanguage } from '../contexts/LanguageContext';
+import { formatDisplayDate } from '../utils/dateFormat';
 
 export default function Training() {
   const { t } = useLanguage();
@@ -297,7 +298,7 @@ export default function Training() {
                     <td className="px-4 py-3"><span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full capitalize">{tr.type}</span></td>
                     <td className="px-4 py-3"><span className="text-xs px-2 py-0.5 bg-purple-50 text-purple-700 rounded-full capitalize">{tr.level}</span></td>
                     <td className="px-4 py-3 text-xs text-slate-600 max-w-[120px] truncate">{tr.instructor}</td>
-                    <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{tr.startDate}</td>
+                    <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{formatDisplayDate(tr.startDate)}</td>
                     <td className="px-4 py-3 font-mono text-xs text-slate-700">{tr.seatsAvailable}/{tr.seatsTotal}</td>
                     <td className="px-4 py-3 font-mono text-sm text-green-700">{tr.netFees === 0 ? 'Free' : `₹${tr.netFees}`}</td>
                     <td className="px-4 py-3">
