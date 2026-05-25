@@ -7,6 +7,7 @@ import { MilkProductionChart } from '../charts/MilkProductionChart';
 import { QuickActions } from './QuickActions';
 import { ActivityFeed } from './ActivityFeed';
 import { AlertsPanel } from './AlertsPanel';
+import OdishaMapDashboard from '../OdishaMap';
 
 type Page = 'dashboard' | 'livestock' | 'health' | 'breeding' | 'farmers' | 'dairy' | 'schemes' | 'insurance' | 'market' | 'training' | 'reports' | 'settings';
 
@@ -313,32 +314,8 @@ export function EnhancedDashboard({ onNavigate }: EnhancedDashboardProps) {
       </div>
 
       {/* Interactive Map Section */}
-      <div className="glass-card rounded-2xl p-6">
-        <div className="mb-6">
-          <h2 className="text-slate-800 mb-1">{t('District Overview Map', 'जिला अवलोकन मानचित्र', 'ଜିଲ୍ଲା ସମୀକ୍ଷା ମାନଚିତ୍ର')}</h2>
-          <p className="text-sm text-slate-600">
-            {t('Visualize livestock density and health centers', 'पशुधन घनत्व और स्वास्थ्य केंद्रों को देखें', 'ପଶୁଧନ ଘନତା ଏବଂ ସ୍ୱାସ୍ଥ୍ୟ କେନ୍ଦ୍ର ଦୃଶ୍ୟମାନ କରନ୍ତୁ')}
-          </p>
-        </div>
-        
-        <div className="bg-gradient-to-br from-green-50 to-amber-50 rounded-xl p-8 flex items-center justify-center min-h-[400px] border border-white/30">
-          <div className="text-center">
-            <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
-              <svg className="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-            </div>
-            <h3 className="text-slate-800 mb-2">
-              {t('Interactive District Map', 'इंटरएक्टिव जिला मानचित्र', 'ଇଣ୍ଟରାକ୍ଟିଭ୍ ଜିଲ୍ଲା ମାନଚିତ୍ର')}
-            </h3>
-            <p className="text-sm text-slate-600 max-w-md mx-auto mb-4">
-              {t('Visualize livestock density, AI centers, and health alerts across Odisha districts', 'ओडिशा जिलों में पशुधन घनत्व, AI केंद्र और स्वास्थ्य अलर्ट देखें', 'ଓଡିଶା ଜିଲ୍ଲାଗୁଡ଼ିକରେ ପଶୁଧନ ଘନତା, AI କେନ୍ଦ୍ର ଏବଂ ସ୍ୱାସ୍ଥ୍ୟ ଚେତାବନୀ ଦୃଶ୍ୟମାନ କରନ୍ତୁ')}
-            </p>
-            <button className="px-6 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all button-press">
-              {t('Launch Map View', 'मानचित्र दृश्य लॉन्च करें', 'ମାନଚିତ୍ର ଦର୍ଶନ ଆରମ୍ଭ କରନ୍ତୁ')}
-            </button>
-          </div>
-        </div>
+      <div className="glass-card rounded-2xl p-6" style={{ height: '100vh' }}>
+        <OdishaMapDashboard />
       </div>
 
       {/* Footer */}
