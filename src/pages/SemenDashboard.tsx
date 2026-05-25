@@ -5,20 +5,29 @@ import {
   AlertTriangle,
   ArrowRightLeft,
   BarChart3,
+  Bot,
+  BrainCircuit,
   CalendarClock,
   CheckCircle2,
   Clock,
+  Database,
   Download,
+  FileDown,
   FileSpreadsheet,
   FlaskConical,
   Map,
   MapPin,
+  MessageSquare,
+  Mic,
   PackageCheck,
   Send,
   ShieldAlert,
+  Share2,
   Sparkles,
   Syringe,
+  Table2,
   TrendingUp,
+  UploadCloud,
 } from 'lucide-react';
 import {
   Bar,
@@ -822,6 +831,9 @@ function ReportsScreen({ districts }: { districts: DistrictSemen[] }) {
   const [animalTypeFilter, setAnimalTypeFilter] = useState('Cattle + Buffalo');
   const [dateFilter, setDateFilter] = useState('2026-05-01');
   const [sortBy, setSortBy] = useState<'district' | 'utilisation' | 'stock' | 'daysToStockout'>('district');
+  const [chatQuery, setChatQuery] = useState('Show critical districts and semen utilisation summary');
+  const [chatAnswer, setChatAnswer] = useState('Critical stock pockets are concentrated in Gajapati, Cuttack, Malkangiri, Deogarh, and Nuapada. Prioritise immediate replenishment for districts below 14 days to stockout, then rebalance excess doses from Balasore and Mayurbhanj. The RAG context used district stock, utilisation, reporting, block, and LAC coverage records.');
+  const [isListening, setIsListening] = useState(false);
   
   const data = districts.slice(0, 12).map((district) => ({
     district: district.name,
@@ -842,6 +854,96 @@ function ReportsScreen({ districts }: { districts: DistrictSemen[] }) {
         return a.name.localeCompare(b.name);
     }
   });
+
+  const totalStock = tableData.reduce((sum, d) => sum + d.stock, 0);
+  const totalAllocated = tableData.reduce((sum, d) => sum + d.allocated, 0);
+  const totalUsed = tableData.reduce((sum, d) => sum + d.used, 0);
+  const totalTarget = tableData.reduce((sum, d) => sum + d.target, 0);
+  const averageUtilisation = Math.round((totalUsed / totalTarget) * 100);
+  const criticalDistricts = tableData.filter((d) => (d.daysToStockout ?? 45) <= 14);
+  const topUtilisation = [...tableData].sort((a, b) => b.used / b.target - a.used / a.target).slice(0, 5);
+  const ragSources = [
+    { name: 'District stock ledger', rows: tableData.length, confidence: 98 },
+    { name: 'AI service history', rows: totalUsed, confidence: 94 },
+    { name: 'Block and LAC drilldown', rows: tableData.reduce((sum, d) => sum + d.blocks + d.lacs, 0), confidence: 91 },
+  ];
+  const masterReportItems = [
+    { title: 'Dose-wise utilisation by semen type', detail: `${formatNumber(totalUsed)} doses used from ${formatNumber(totalAllocated)} allocated`, tone: 'bg-green-50 text-green-700 border-green-200' },
+    { title: 'Farmer-wise AI service history', detail: 'Service timeline, technician, cattle or buffalo, repeat AI, and outcome flags', tone: 'bg-blue-50 text-blue-700 border-blue-200' },
+    { title: 'Breed and demographic coverage', detail: `${formatNumber(totalTarget)} target coverage with breed, age group, and village segmentation`, tone: 'bg-amber-50 text-amber-700 border-amber-200' },
+    { title: 'District, block, LAC drilldown extract', detail: `${tableData.length} districts, ${tableData.reduce((sum, d) => sum + d.blocks, 0)} blocks, ${tableData.reduce((sum, d) => sum + d.lacs, 0)} LACs`, tone: 'bg-slate-50 text-slate-700 border-slate-200' },
+  ];
+
+  const answerQuestion = (query = chatQuery) => {
+    const normalized = query.toLowerCase();
+    const lowestStock = [...tableData].sort((a, b) => a.stock - b.stock).slice(0, 3).map((d) => d.name).join(', ');
+    const bestUtilisation = topUtilisation.map((d) => `${d.name} ${Math.round((d.used / d.target) * 100)}%`).join(', ');
+    const criticalNames = criticalDistricts.map((d) => d.name).join(', ') || 'no critical districts';
+    let response = `State utilisation is ${averageUtilisation}% with ${formatNumber(totalStock)} doses in stock. Critical districts are ${criticalNames}. Recommended action: push replenishment to low-stock districts, verify pending LAC reporting, and export the master report for review.`;
+
+    if (normalized.includes('critical') || normalized.includes('stockout')) {
+      response = `${criticalDistricts.length} districts are at or below 14 days to stockout: ${criticalNames}. Dispatch priority should start with ${lowestStock}, and the procurement queue should reserve buffer for remote LACs.`;
+    } else if (normalized.includes('utilisation') || normalized.includes('performance')) {
+      response = `Top utilisation districts are ${bestUtilisation}. Overall utilisation is ${averageUtilisation}%, so the next review should compare demand with allocated doses before releasing additional sex-sorted stock.`;
+    } else if (normalized.includes('farmer') || normalized.includes('history')) {
+      response = `Farmer-wise AI history should be filtered by district, breed, technician, and repeat-service status. The current master extract can link ${formatNumber(totalUsed)} completed AI services with field-level demographic coverage.`;
+    } else if (normalized.includes('excel') || normalized.includes('download')) {
+      response = 'Excel-ready export is prepared with district summary, dose utilisation, critical stockout list, and RAG source metadata. Use the Excel button below to download the CSV extract.';
+    }
+
+    setChatAnswer(response);
+  };
+
+  const downloadMasterCsv = () => {
+    const header = ['District', 'Current Stock', 'Allocated', 'Used', 'Target', 'Utilisation %', 'Days to Stockout', 'Blocks', 'LACs', 'Reporting'];
+    const rows = tableData.map((d) => [
+      d.name,
+      d.stock,
+      d.allocated,
+      d.used,
+      d.target,
+      Math.round((d.used / d.target) * 100),
+      d.daysToStockout ?? 'Long buffer',
+      d.blocks,
+      d.lacs,
+      d.reporting ? 'Reporting' : 'Pending',
+    ]);
+    const csv = [header, ...rows].map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `semen-master-report-${dateFilter}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const shareReport = async () => {
+    const shareText = `Semen master report: ${averageUtilisation}% utilisation, ${formatNumber(totalStock)} stock, ${criticalDistricts.length} critical districts.`;
+    if (navigator.share) {
+      await navigator.share({ title: 'Semen Master Report', text: shareText });
+      return;
+    }
+    await navigator.clipboard?.writeText(shareText);
+  };
+
+  const startVoiceInput = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setChatAnswer('Voice input is ready for supported browsers. This browser does not expose speech recognition, so type the question and press Ask AI.');
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-IN';
+    recognition.interimResults = false;
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onresult = (event: any) => {
+      const transcript = event.results?.[0]?.[0]?.transcript || '';
+      setChatQuery(transcript);
+      answerQuestion(transcript);
+    };
+    recognition.start();
+  };
 
   return (
     <div className="space-y-6">
@@ -887,7 +989,7 @@ function ReportsScreen({ districts }: { districts: DistrictSemen[] }) {
                     <td className="py-3 px-4 text-sm font-mono text-slate-700">{formatNumber(district.used)}</td>
                     <td className="py-3 px-4 text-sm font-mono text-slate-700">{formatNumber(district.target)}</td>
                     <td className="py-3 px-4 text-center"><span className={`px-3 py-1 rounded-full text-sm font-semibold ${utilisationStyle}`}>{utilisationPct}%</span></td>
-                    <td className="py-3 px-4 text-right"><span className={`px-3 py-1 rounded-full text-sm font-semibold ${daysStyle}`}>{district.daysToStockout ?? '∞'}</span></td>
+                    <td className="py-3 px-4 text-right"><span className={`px-3 py-1 rounded-full text-sm font-semibold ${daysStyle}`}>{district.daysToStockout ?? 'Long buffer'}</span></td>
                     <td className="py-3 px-4 text-sm text-slate-700">{district.blocks}</td>
                     <td className="py-3 px-4 text-sm text-slate-700">{district.lacs}</td>
                     <td className="py-3 px-4 text-center"><span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColor}`}>{district.reporting ? 'Reporting' : 'Pending'}</span></td>
@@ -915,7 +1017,7 @@ function ReportsScreen({ districts }: { districts: DistrictSemen[] }) {
             <p className="text-xs text-slate-500 mt-1">{Math.round(tableData.filter(d => d.reporting).length / tableData.length * 100)}% active</p>
           </div>
           <div className="p-4 rounded-xl bg-white/50 border border-white/30">
-            <p className="text-xs text-slate-600 mb-1">Critical (Days to Stockout ≤ 14)</p>
+            <p className="text-xs text-slate-600 mb-1">Critical (Days to Stockout &lt;= 14)</p>
             <p className="text-2xl font-bold text-red-700">{tableData.filter(d => (d.daysToStockout ?? 45) <= 14).length}</p>
             <p className="text-xs text-slate-500 mt-1">Immediate action needed</p>
           </div>
@@ -959,16 +1061,168 @@ function ReportsScreen({ districts }: { districts: DistrictSemen[] }) {
           <DownloadButtons />
         </div>
         <div className="glass-card rounded-2xl p-6">
-          <SectionHeader eyebrow="MASTER REPORT" title="Dose-wise, Farmer-wise, Demographic Breakdown" detail="Downloadable master report summary." />
-          <div className="space-y-3 mb-4">
-            {['Dose-wise utilisation by semen type', 'Farmer-wise AI service history', 'Breed and demographic coverage', 'District, block, LAC drilldown extract'].map((item) => (
-              <div key={item} className="flex items-center gap-3 p-3 rounded-xl bg-white/60 border border-white/30">
-                <FileSpreadsheet size={18} className="text-green-700" />
-                <span className="text-sm text-slate-800">{item}</span>
+          <SectionHeader eyebrow="MASTER REPORT" title="Dose-wise, Farmer-wise, Demographic Breakdown" detail="AI-ready master extract with district, block, LAC, farmer, breed, and service history coverage." />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+            {masterReportItems.map((item) => (
+              <div key={item.title} className={`p-3 rounded-xl border ${item.tone}`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <FileSpreadsheet size={17} />
+                  <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">{item.detail}</p>
               </div>
             ))}
           </div>
-          <DownloadButtons />
+          <div className="grid grid-cols-3 gap-2 mb-3 mt-3">
+            <div className="p-3 rounded-xl bg-white/70 border border-white/40">
+              <p className="text-xs text-slate-500">Utilisation</p>
+              <p className="text-xl font-mono text-slate-900">{averageUtilisation}%</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/70 border border-white/40">
+              <p className="text-xs text-slate-500">Critical</p>
+              <p className="text-xl font-mono text-red-700">{criticalDistricts.length}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/70 border border-white/40">
+              <p className="text-xs text-slate-500">RAG Ready</p>
+              <p className="text-xl font-mono text-green-700">{ragSources.length}</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button onClick={downloadMasterCsv} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-green-600 text-white text-sm hover:bg-green-700 transition-colors">
+              <FileDown size={16} /> Excel CSV
+            </button>
+            <button onClick={shareReport} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/70 border border-white/40 text-slate-700 text-sm hover:bg-white transition-colors">
+              <Share2 size={16} /> Share
+            </button>
+            <DownloadButtons />
+          </div>
+        </div>
+      </div>
+      <div className="hidden glass-card rounded-2xl p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
+          <SectionHeader eyebrow="AHMS AI CHAT BOT" title="Ask Reports by Text or Voice" detail="Plug-and-play frontend for retrieval-backed semen analytics, graph answers, Excel exports, and shareable summaries." />
+          <div className="flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-green-50 text-green-700 border border-green-200 text-xs font-semibold">
+              <Database size={14} /> RAG connected
+            </span>
+            <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold">
+              <BrainCircuit size={14} /> API ready
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-[1.15fr_0.85fr] gap-5">
+          <div className="space-y-4">
+            <div className="rounded-2xl bg-white/70 border border-white/40 p-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-11 h-11 rounded-2xl bg-green-600 text-white flex items-center justify-center">
+                  <Bot size={22} />
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">AI Master Report Assistant</p>
+                  <p className="text-xs text-slate-500">Answers from district stock, AI service history, demographics, and LAC drilldown context.</p>
+                </div>
+              </div>
+              <div className="flex flex-col md:flex-row gap-2">
+                <div className="relative flex-1">
+                  <MessageSquare size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    value={chatQuery}
+                    onChange={(event) => setChatQuery(event.target.value)}
+                    onKeyDown={(event) => event.key === 'Enter' && answerQuestion()}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="Ask: Which districts need urgent stock? Show farmer-wise AI history..."
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={startVoiceInput} title="Voice to text" className={`w-12 h-12 rounded-xl flex items-center justify-center border transition-colors ${isListening ? 'bg-red-600 text-white border-red-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}>
+                    <Mic size={18} />
+                  </button>
+                  <button onClick={() => answerQuestion()} className="flex items-center gap-2 px-4 py-3 rounded-xl bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors">
+                    <Send size={16} /> Ask AI
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-3">
+                {['Critical stockout list', 'Dose utilisation performance', 'Farmer-wise AI service history', 'Excel download summary'].map((prompt) => (
+                  <button key={prompt} onClick={() => { setChatQuery(prompt); answerQuestion(prompt); }} className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs hover:bg-slate-200 transition-colors">
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-slate-900 text-white p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles size={18} className="text-green-300" />
+                <p className="text-sm font-semibold">AI output</p>
+              </div>
+              <p className="text-sm leading-6 text-slate-100 mb-4">{chatAnswer}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {ragSources.map((source) => (
+                  <div key={source.name} className="rounded-xl bg-white/10 border border-white/10 p-3">
+                    <p className="text-xs text-slate-300">{source.name}</p>
+                    <p className="text-lg font-mono">{formatNumber(source.rows)}</p>
+                    <p className="text-xs text-green-200">{source.confidence}% confidence</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="p-4 rounded-xl bg-white/70 border border-white/40">
+                <p className="text-xs text-slate-500 mb-1">API endpoint</p>
+                <p className="text-sm font-mono text-slate-800">/api/ai/semen-rag</p>
+              </div>
+              <div className="p-4 rounded-xl bg-white/70 border border-white/40">
+                <p className="text-xs text-slate-500 mb-1">Upload sources</p>
+                <p className="text-sm text-slate-800 flex items-center gap-2"><UploadCloud size={15} /> PDF, Excel, CSV</p>
+              </div>
+              <div className="p-4 rounded-xl bg-white/70 border border-white/40">
+                <p className="text-xs text-slate-500 mb-1">Export pack</p>
+                <p className="text-sm text-slate-800 flex items-center gap-2"><Table2 size={15} /> CSV, PDF, chart</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-2xl bg-white/70 border border-white/40 p-4">
+              <p className="text-sm font-semibold text-slate-900 mb-3">AI-generated graph answer</p>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={topUtilisation.map((district) => ({ district: district.name, utilisation: Math.round((district.used / district.target) * 100), stock: district.stock }))}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="district" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="utilisation" fill="#16a34a" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="stock" fill="#2563eb" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="rounded-2xl bg-white/70 border border-white/40 p-4">
+              <p className="text-sm font-semibold text-slate-900 mb-3">Recommended action queue</p>
+              <div className="space-y-2">
+                {criticalDistricts.slice(0, 5).map((district) => (
+                  <div key={district.id} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-red-50 border border-red-100">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">{district.name}</p>
+                      <p className="text-xs text-slate-500">{district.blocks} blocks · {district.lacs} LACs · {district.lastUpdated}</p>
+                    </div>
+                    <span className="px-2 py-1 rounded-lg bg-red-600 text-white text-xs font-semibold">{district.daysToStockout} days</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={downloadMasterCsv} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-green-600 text-white text-sm hover:bg-green-700 transition-colors">
+                <FileDown size={16} /> Download report
+              </button>
+              <button onClick={shareReport} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/70 border border-white/40 text-slate-700 text-sm hover:bg-white transition-colors">
+                <Share2 size={16} /> Share summary
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

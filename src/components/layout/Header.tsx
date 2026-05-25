@@ -1,4 +1,4 @@
-import { Search, Bell, Globe, User, LogOut, MapPin, ChevronDown, X } from 'lucide-react';
+import { Search, Bell, Bot, Globe, User, LogOut, MapPin, ChevronDown, X } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -6,11 +6,12 @@ import { useDistrict, ALL_DISTRICTS } from '../../contexts/DistrictContext';
 
 interface HeaderProps {
   isCollapsed: boolean;
+  onAiClick?: () => void;
 }
 
 const WEB_ROLES = ['directorate', 'cdvo', 'sdvo', 'bvo'];
 
-export function Header({ isCollapsed }: HeaderProps) {
+export function Header({ isCollapsed, onAiClick }: HeaderProps) {
   const { language, setLanguage } = useLanguage();
   const { user, logout } = useAuth();
   const { selectedDistrict, setSelectedDistrict } = useDistrict();
@@ -139,6 +140,16 @@ export function Header({ isCollapsed }: HeaderProps) {
 
         {/* Right Section */}
         <div className="flex items-center gap-3">
+
+          {/* AHMS AI Chatbot */}
+          <button
+            onClick={onAiClick}
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-green-600 text-white hover:bg-green-700 transition-all button-press shadow-sm"
+            title="Open AHMS AI chat bot"
+          >
+            <Bot size={16} />
+            <span className="hidden lg:inline text-sm font-medium">AI Chat</span>
+          </button>
 
           {/* Language Toggle */}
           <div className="relative group">

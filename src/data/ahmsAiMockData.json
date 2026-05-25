@@ -1,0 +1,63 @@
+{
+  "assistantName": "AHMS AI chat bot",
+  "defaultAnswer": "I can help with semen stock, farmer AI service history, medicine requests, vaccination alerts, livestock coverage, MVU activity, downloadable reports, and district drilldowns.",
+  "quickPrompts": [
+    "Critical semen stock",
+    "Farmer AI service history",
+    "Medicine request summary",
+    "Disease alert trend",
+    "Show graph insight",
+    "Download report"
+  ],
+  "moduleSummaries": [
+    {
+      "name": "Semen stock",
+      "value": 15700,
+      "unit": "doses",
+      "status": "Watch",
+      "detail": "8 districts need replenishment in the next 14 days."
+    },
+    {
+      "name": "Farmer AI services",
+      "value": 18420,
+      "unit": "services",
+      "status": "Healthy",
+      "detail": "Repeat AI and breed-wise follow-up data available."
+    },
+    {
+      "name": "Medicine requests",
+      "value": 126,
+      "unit": "requests",
+      "status": "Action",
+      "detail": "P0 and P1 requests require approval tracking."
+    },
+    {
+      "name": "Vaccination alerts",
+      "value": 9,
+      "unit": "alerts",
+      "status": "Action",
+      "detail": "FMD and HS watch zones need field verification."
+    }
+  ],
+  "answers": {
+    "critical": "Critical stock view: Cuttack, Gajapati, Malkangiri, Deogarh, Nuapada, Jajapur, Kandhamal, and Nabarangpur need priority review. Suggested action is to dispatch available doses, verify LAC reporting, and prepare a district-wise stock transfer note.",
+    "semen": "Semen report summary: monitor stock, allocated doses, AI usage, target achievement, days to stockout, block coverage, and LAC reporting status. The master report can be exported with district, block, LAC, farmer, breed, and technician fields.",
+    "farmer": "Farmer AI service history: show farmer ID, animal tag, breed, parity, AI date, semen type, technician, repeat-service flag, pregnancy follow-up, and village coverage. This is ready for RAG search and Excel export.",
+    "medicine": "Medicine request summary: P0 and P1 requests should be routed to BVO approval, checked against stock availability, and tracked through dispatch status. Include medicine name, source LAC, urgency, quantity, and approval outcome.",
+    "disease": "Disease alert trend: combine vaccination due lists, reported symptoms, MVU visits, and block-level disease watch zones. Priority output should show alert severity, affected villages, and pending field action.",
+    "graph": "Graph insight: compare utilisation percentage against stock balance. Use bar charts for district performance and line charts for month-wise service trends. Highlight outliers with low stock and high service demand.",
+    "download": "Download-ready report: CSV/Excel export includes module, district, indicator, value, status, and recommended action. The same payload can be converted to PDF after backend integration."
+  },
+  "graphSeries": [
+    { "label": "Semen", "value": 86 },
+    { "label": "AI service", "value": 92 },
+    { "label": "Medicine", "value": 74 },
+    { "label": "Vaccination", "value": 68 }
+  ],
+  "ragSources": [
+    { "name": "Semen master report", "records": 15700, "confidence": 98 },
+    { "name": "Farmer AI history", "records": 18420, "confidence": 95 },
+    { "name": "Medicine workflow", "records": 126, "confidence": 91 },
+    { "name": "Disease and vaccination alerts", "records": 9, "confidence": 88 }
+  ]
+}
