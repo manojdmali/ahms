@@ -1,0 +1,443 @@
+[2m11:18:37 AM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Unterminated regexp literal
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:377:1]
+ 374 |                       </div>
+ 375 |                     ))}
+ 376 |                   </div>
+ 377 |                   </div>
+     :                    ^^^^^
+ 378 |                   )}
+ 379 |                 </div>
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/App.tsx[39m
+  
+[2m11:18:37 AM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Unterminated regexp literal
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:377:1]
+ 374 |                       </div>
+ 375 |                     ))}
+ 376 |                   </div>
+ 377 |                   </div>
+     :                    ^^^^^
+ 378 |                   )}
+ 379 |                 </div>
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/App.tsx[39m
+  
+[2m11:18:37 AM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Unterminated regexp literal
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:377:1]
+ 374 |                       </div>
+ 375 |                     ))}
+ 376 |                   </div>
+ 377 |                   </div>
+     :                    ^^^^^
+ 378 |                   )}
+ 379 |                 </div>
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/App.tsx[39m
+  
+[2m11:19:07 AM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:434:1]
+ 431 |             </div>
+ 432 |           </div>
+ 433 |         </div>
+ 434 |       )}
+     :        ^
+ 435 | 
+ 436 |       <div className="fixed bottom-5 right-5 z-40">
+ 437 |         <button
+     `----
+  x Expression expected
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:445:1]
+ 442 |           <Bot size={25} />
+ 443 |         </button>
+ 444 |       </div>
+ 445 |     </>
+     :       ^
+ 446 |   );
+ 447 | }
+     `----
+  x Expected '</', got ')'
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:446:1]
+ 443 |         </button>
+ 444 |       </div>
+ 445 |     </>
+ 446 |   );
+     :   ^
+ 447 | }
+ 448 | 
+ 449 | function AppShell() {
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/App.tsx[39m
+  
+[2m11:19:07 AM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:434:1]
+ 431 |             </div>
+ 432 |           </div>
+ 433 |         </div>
+ 434 |       )}
+     :        ^
+ 435 | 
+ 436 |       <div className="fixed bottom-5 right-5 z-40">
+ 437 |         <button
+     `----
+  x Expression expected
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:445:1]
+ 442 |           <Bot size={25} />
+ 443 |         </button>
+ 444 |       </div>
+ 445 |     </>
+     :       ^
+ 446 |   );
+ 447 | }
+     `----
+  x Expected '</', got ')'
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:446:1]
+ 443 |         </button>
+ 444 |       </div>
+ 445 |     </>
+ 446 |   );
+     :   ^
+ 447 | }
+ 448 | 
+ 449 | function AppShell() {
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/App.tsx[39m
+  
+[2m11:19:07 AM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:434:1]
+ 431 |             </div>
+ 432 |           </div>
+ 433 |         </div>
+ 434 |       )}
+     :        ^
+ 435 | 
+ 436 |       <div className="fixed bottom-5 right-5 z-40">
+ 437 |         <button
+     `----
+  x Expression expected
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:445:1]
+ 442 |           <Bot size={25} />
+ 443 |         </button>
+ 444 |       </div>
+ 445 |     </>
+     :       ^
+ 446 |   );
+ 447 | }
+     `----
+  x Expected '</', got ')'
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:446:1]
+ 443 |         </button>
+ 444 |       </div>
+ 445 |     </>
+ 446 |   );
+     :   ^
+ 447 | }
+ 448 | 
+ 449 | function AppShell() {
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/App.tsx[39m
+  
+[2m11:19:34 AM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Unterminated regexp literal
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:338:1]
+ 335 |                         <p className="text-sm leading-5">{submittedQuery}</p>
+ 336 |             </div>
+ 337 |           </div>
+ 338 |         </div>
+     :          ^^^^^
+ 339 |       )}
+ 340 | 
+ 341 |                   <div className="flex justify-start">
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/App.tsx[39m
+  
+[2m11:19:34 AM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Unterminated regexp literal
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:338:1]
+ 335 |                         <p className="text-sm leading-5">{submittedQuery}</p>
+ 336 |             </div>
+ 337 |           </div>
+ 338 |         </div>
+     :          ^^^^^
+ 339 |       )}
+ 340 | 
+ 341 |                   <div className="flex justify-start">
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/App.tsx[39m
+  
+[2m11:19:34 AM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Unterminated regexp literal
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:338:1]
+ 335 |                         <p className="text-sm leading-5">{submittedQuery}</p>
+ 336 |             </div>
+ 337 |           </div>
+ 338 |         </div>
+     :          ^^^^^
+ 339 |       )}
+ 340 | 
+ 341 |                   <div className="flex justify-start">
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/App.tsx[39m
+  
+[2m11:19:56 AM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:434:1]
+ 431 |             </div>
+ 432 |           </div>
+ 433 |         </div>
+ 434 |       )}
+     :        ^
+ 435 | 
+ 436 |       <div className="fixed bottom-5 right-5 z-40">
+ 437 |         <button
+     `----
+  x Expression expected
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:445:1]
+ 442 |           <Bot size={25} />
+ 443 |         </button>
+ 444 |       </div>
+ 445 |     </>
+     :       ^
+ 446 |   );
+ 447 | }
+     `----
+  x Expected '</', got ')'
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:446:1]
+ 443 |         </button>
+ 444 |       </div>
+ 445 |     </>
+ 446 |   );
+     :   ^
+ 447 | }
+ 448 | 
+ 449 | function AppShell() {
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/App.tsx[39m
+  
+[2m11:19:56 AM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:434:1]
+ 431 |             </div>
+ 432 |           </div>
+ 433 |         </div>
+ 434 |       )}
+     :        ^
+ 435 | 
+ 436 |       <div className="fixed bottom-5 right-5 z-40">
+ 437 |         <button
+     `----
+  x Expression expected
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:445:1]
+ 442 |           <Bot size={25} />
+ 443 |         </button>
+ 444 |       </div>
+ 445 |     </>
+     :       ^
+ 446 |   );
+ 447 | }
+     `----
+  x Expected '</', got ')'
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:446:1]
+ 443 |         </button>
+ 444 |       </div>
+ 445 |     </>
+ 446 |   );
+     :   ^
+ 447 | }
+ 448 | 
+ 449 | function AppShell() {
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/App.tsx[39m
+  
+[2m11:19:56 AM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:434:1]
+ 431 |             </div>
+ 432 |           </div>
+ 433 |         </div>
+ 434 |       )}
+     :        ^
+ 435 | 
+ 436 |       <div className="fixed bottom-5 right-5 z-40">
+ 437 |         <button
+     `----
+  x Expression expected
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:445:1]
+ 442 |           <Bot size={25} />
+ 443 |         </button>
+ 444 |       </div>
+ 445 |     </>
+     :       ^
+ 446 |   );
+ 447 | }
+     `----
+  x Expected '</', got ')'
+     ,-[D:/aicode/kishore/ahms/src/App.tsx:446:1]
+ 443 |         </button>
+ 444 |       </div>
+ 445 |     </>
+ 446 |   );
+     :   ^
+ 447 | }
+ 448 | 
+ 449 | function AppShell() {
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/App.tsx[39m
+  
+[2m3:30:31 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error:   x Expected ',', got ':'
+     ,-[D:/aicode/kishore/ahms/src/data/mockUsers.ts:187:1]
+ 184 |   sdvo: ['sdvo-semen', 'dashboard', 'livestock', 'health', 'breeding'],
+ 185 |   bvo: ['bvo-medicine-queue', 'bvo-mvu-plan', 'bvo-mvu-inventory', 'bvo-mvu-assignment', 'reports'],
+ 186 |   ait: ['breeding',
+ 187 |   lac: ['lac-medicine-home', 'lac-medicine-log', 'lac-medicine-farmer', 'lac-medicine-barcode', 'lac-medicine-request', 'lac-medicine-inventory', 'lac-medicine-offline'],
+     :      ^
+ 188 |   mvu: ['mvu-team-home', 'mvu-team-visit', 'mvu-team-daily', 'mvu-team-stock', 'health'],
+ 189 |   farmer: ['farmer-medicine-login', 'farmer-medicine-request', 'farmer-medicine-history', 'farmer-medicine-chatbot'],
+ 190 | };
+     `----
+
+
+Caused by:
+    Syntax Error
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/data/mockUsers.ts[39m
+[2m3:30:31 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error:   x Expected ',', got ':'
+     ,-[D:/aicode/kishore/ahms/src/data/mockUsers.ts:187:1]
+ 184 |   sdvo: ['sdvo-semen', 'dashboard', 'livestock', 'health', 'breeding'],
+ 185 |   bvo: ['bvo-medicine-queue', 'bvo-mvu-plan', 'bvo-mvu-inventory', 'bvo-mvu-assignment', 'reports'],
+ 186 |   ait: ['breeding',
+ 187 |   lac: ['lac-medicine-home', 'lac-medicine-log', 'lac-medicine-farmer', 'lac-medicine-barcode', 'lac-medicine-request', 'lac-medicine-inventory', 'lac-medicine-offline'],
+     :      ^
+ 188 |   mvu: ['mvu-team-home', 'mvu-team-visit', 'mvu-team-daily', 'mvu-team-stock', 'health'],
+ 189 |   farmer: ['farmer-medicine-login', 'farmer-medicine-request', 'farmer-medicine-history', 'farmer-medicine-chatbot'],
+ 190 | };
+     `----
+
+
+Caused by:
+    Syntax Error
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/data/mockUsers.ts[39m
+[2m3:30:31 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error:   x Expected ',', got ':'
+     ,-[D:/aicode/kishore/ahms/src/data/mockUsers.ts:187:1]
+ 184 |   sdvo: ['sdvo-semen', 'dashboard', 'livestock', 'health', 'breeding'],
+ 185 |   bvo: ['bvo-medicine-queue', 'bvo-mvu-plan', 'bvo-mvu-inventory', 'bvo-mvu-assignment', 'reports'],
+ 186 |   ait: ['breeding',
+ 187 |   lac: ['lac-medicine-home', 'lac-medicine-log', 'lac-medicine-farmer', 'lac-medicine-barcode', 'lac-medicine-request', 'lac-medicine-inventory', 'lac-medicine-offline'],
+     :      ^
+ 188 |   mvu: ['mvu-team-home', 'mvu-team-visit', 'mvu-team-daily', 'mvu-team-stock', 'health'],
+ 189 |   farmer: ['farmer-medicine-login', 'farmer-medicine-request', 'farmer-medicine-history', 'farmer-medicine-chatbot'],
+ 190 | };
+     `----
+
+
+Caused by:
+    Syntax Error
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/data/mockUsers.ts[39m
+[2m3:30:31 PM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Expected ',', got ':'
+     ,-[D:/aicode/kishore/ahms/src/data/mockUsers.ts:187:1]
+ 184 |   sdvo: ['sdvo-semen', 'dashboard', 'livestock', 'health', 'breeding'],
+ 185 |   bvo: ['bvo-medicine-queue', 'bvo-mvu-plan', 'bvo-mvu-inventory', 'bvo-mvu-assignment', 'reports'],
+ 186 |   ait: ['breeding',
+ 187 |   lac: ['lac-medicine-home', 'lac-medicine-log', 'lac-medicine-farmer', 'lac-medicine-barcode', 'lac-medicine-request', 'lac-medicine-inventory', 'lac-medicine-offline'],
+     :      ^
+ 188 |   mvu: ['mvu-team-home', 'mvu-team-visit', 'mvu-team-daily', 'mvu-team-stock', 'health'],
+ 189 |   farmer: ['farmer-medicine-login', 'farmer-medicine-request', 'farmer-medicine-history', 'farmer-medicine-chatbot'],
+ 190 | };
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/data/mockUsers.ts[39m
+  
+[2m3:30:31 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error:   x Expected ',', got ':'
+     ,-[D:/aicode/kishore/ahms/src/data/mockUsers.ts:187:1]
+ 184 |   sdvo: ['sdvo-semen', 'dashboard', 'livestock', 'health', 'breeding'],
+ 185 |   bvo: ['bvo-medicine-queue', 'bvo-mvu-plan', 'bvo-mvu-inventory', 'bvo-mvu-assignment', 'reports'],
+ 186 |   ait: ['breeding',
+ 187 |   lac: ['lac-medicine-home', 'lac-medicine-log', 'lac-medicine-farmer', 'lac-medicine-barcode', 'lac-medicine-request', 'lac-medicine-inventory', 'lac-medicine-offline'],
+     :      ^
+ 188 |   mvu: ['mvu-team-home', 'mvu-team-visit', 'mvu-team-daily', 'mvu-team-stock', 'health'],
+ 189 |   farmer: ['farmer-medicine-login', 'farmer-medicine-request', 'farmer-medicine-history', 'farmer-medicine-chatbot'],
+ 190 | };
+     `----
+
+
+Caused by:
+    Syntax Error
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/data/mockUsers.ts[39m
+[2m3:30:31 PM[22m [31m[1m[vite][22m[39m [31mInternal server error:   x Expected ',', got ':'
+     ,-[D:/aicode/kishore/ahms/src/data/mockUsers.ts:187:1]
+ 184 |   sdvo: ['sdvo-semen', 'dashboard', 'livestock', 'health', 'breeding'],
+ 185 |   bvo: ['bvo-medicine-queue', 'bvo-mvu-plan', 'bvo-mvu-inventory', 'bvo-mvu-assignment', 'reports'],
+ 186 |   ait: ['breeding',
+ 187 |   lac: ['lac-medicine-home', 'lac-medicine-log', 'lac-medicine-farmer', 'lac-medicine-barcode', 'lac-medicine-request', 'lac-medicine-inventory', 'lac-medicine-offline'],
+     :      ^
+ 188 |   mvu: ['mvu-team-home', 'mvu-team-visit', 'mvu-team-daily', 'mvu-team-stock', 'health'],
+ 189 |   farmer: ['farmer-medicine-login', 'farmer-medicine-request', 'farmer-medicine-history', 'farmer-medicine-chatbot'],
+ 190 | };
+     `----
+
+
+Caused by:
+    Syntax Error[39m
+  Plugin: [35mvite:react-swc[39m
+  File: [36mD:/aicode/kishore/ahms/src/data/mockUsers.ts[39m
+  

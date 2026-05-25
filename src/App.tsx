@@ -434,7 +434,7 @@ function AhmsAiChatbot({
         </div>
       )}
 
-      <div className="fixed bottom-5 right-5 z-40">
+      <div className="fixed bottom-5 right-5 z-40 hidden">
         <button
           onClick={() => onOpenChange(!isOpen)}
           className="ml-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-600 text-white shadow-2xl ring-4 ring-green-100 transition-transform hover:scale-105"

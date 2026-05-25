@@ -385,17 +385,17 @@ export function CDVOMVUOperations({ units = mvuUnits }: CDVOMVUProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <div className="glass-card-darker rounded-2xl p-6"><p className="text-sm text-green-700">CDVO Web Portal</p><h2 className="text-2xl text-slate-900">District MVU Dashboard</h2></div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="glass-card rounded-2xl p-6 lg:col-span-2"><h3>S5-C-01 District MVUs</h3><div className="grid gap-3 mt-4">{units.slice(0, 4).map((unit) => <div key={unit.id} className="p-3 rounded-xl bg-white/70 border border-white/40 flex justify-between"><span>{unit.id} {unit.status}</span><span>{Math.round((unit.villagesVisited / unit.villagesPlanned) * 100)}%</span></div>)}</div></div>
+        <div className="glass-card rounded-2xl p-6 lg:col-span-2"><h3>District MVUs</h3><div className="grid gap-3 mt-4">{units.slice(0, 4).map((unit) => <div key={unit.id} className="p-3 rounded-xl bg-white/70 border border-white/40 flex justify-between"><span>{unit.id} {unit.status}</span><span>{Math.round((unit.villagesVisited / unit.villagesPlanned) * 100)}%</span></div>)}</div></div>
         <div className="glass-card rounded-2xl p-6"><h3>Pending Tour Plans</h3><p className="text-3xl font-mono my-3">1</p><p className="text-sm text-slate-600">BVO submitted 3-month plan.</p></div>
       </div>
       <div className="glass-card rounded-2xl p-6">
-        <p className="text-xs text-green-700 font-semibold">S5-C-02 DEMO CRITICAL</p><h3 className="text-slate-900 mb-3">Tour Plan Approval</h3>
+       <h3 className="text-slate-900 mb-3">Tour Plan Approval</h3>
         <p className="text-sm text-slate-600 mb-3">Village list per week: Remuna, Basta, Soro, Nilgiri, Jaleswar.</p>
         <textarea value={comment} onChange={(event) => setComment(event.target.value)} className="w-full p-3 rounded-xl bg-white/70 border border-white/30 mb-3" />
-        <button onClick={() => setApproved(true)} className="px-5 py-3 rounded-xl bg-green-600 text-white">Approve Plan</button>
+        <button onClick={() => setApproved(true)} className="px-5 py-3 rounded-xl bg-green-600 text-white px-3">Approve Plan</button>
         {approved && <div className="mt-3 p-3 rounded-xl bg-green-50 border border-green-200 text-green-800">BVO mobile status updated to Approved.</div>}
       </div>
-      <div className="glass-card rounded-2xl p-6"><h3>S5-C-03 District Reports</h3><p className="text-sm text-slate-600 mb-3">Tour compliance, services rendered vs targets, and MVU medicine inventory.</p><DownloadButtons /></div>
+      <div className="glass-card rounded-2xl p-6"><h3>District Reports</h3><p className="text-sm text-slate-600 mb-3">Tour compliance, services rendered vs targets, and MVU medicine inventory.</p><DownloadButtons /></div>
     </motion.div>
   );
 }
@@ -749,7 +749,7 @@ export function BVOMVUOperations({ screen = 'plan', tourStatus = 'Pending', onTo
               onClick={() => onTourStatusChange?.('Pending')}
               className="inline-flex min-h-11 w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-green-700/20 transition-all button-press hover:from-green-700 hover:to-emerald-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-white/70"
             >
-              <Send size={16} />
+              <Send size={14} />
               <span>Submit for CDVO Approval</span>
             </button>
             <span className="inline-flex min-h-10 w-full sm:w-auto items-center justify-center rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800">

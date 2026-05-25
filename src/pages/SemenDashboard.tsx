@@ -1334,10 +1334,10 @@ export function CDVOSemenPortal({ districts = odishaDistricts }: { districts?: D
         <h2 className="text-2xl text-slate-900 mb-4">District Semen Operations - {district.name}</h2>
         <div className="flex flex-wrap gap-2">
           {[
-            ['dashboard', 'S1-C-01 District Dashboard'],
-            ['allocation', 'S1-C-02 Block Allocation'],
-            ['approval', 'S1-C-03 Request Approval'],
-            ['reports', 'S1-C-04 District Reports'],
+            ['dashboard', 'District Dashboard'],
+            ['allocation', 'Block Allocation'],
+            ['approval', 'Request Approval'],
+            ['reports', 'District Reports'],
           ].map(([key, label]) => (
             <button key={key} onClick={() => setActive(key as typeof active)} className={`px-3 py-2 rounded-xl text-sm ${active === key ? 'bg-green-600 text-white' : 'bg-white/70 text-slate-700'}`}>{label}</button>
           ))}
@@ -1371,12 +1371,12 @@ function BlockAllocation({ blocks }: { blocks: ReturnType<typeof makeBlocks> }) 
   const [block, setBlock] = useState(blocks[0]?.name ?? '');
   return (
     <div className="glass-card rounded-2xl p-6">
-      <SectionHeader eyebrow="S1-C-02" title="Block Allocation Screen" detail="Select block, type, quantity, pickup slot, and redistribute between blocks." />
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <SectionHeader eyebrow="" title="Block Allocation Screen" detail="Select block, type, quantity, pickup slot, and redistribute between blocks." />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
         <select value={block} onChange={(event) => setBlock(event.target.value)} className="px-4 py-2.5 rounded-xl bg-white/70 border border-white/30">{blocks.map((item) => <option key={item.name}>{item.name}</option>)}</select>
-        <select className="px-4 py-2.5 rounded-xl bg-white/70 border border-white/30"><option>Normal</option><option>Sex Sorted</option></select>
-        <input type="number" defaultValue={120} className="px-4 py-2.5 rounded-xl bg-white/70 border border-white/30" />
-        <input type="datetime-local" defaultValue="2026-05-25T11:00" className="px-4 py-2.5 rounded-xl bg-white/70 border border-white/30" />
+        <select className="px-4 py-2.5 rounded-xl bg-white/70 border border-green/30"><option>Normal</option><option>Sex Sorted</option></select>
+        <input type="number" defaultValue={120} className="px-4 py-2.5 rounded-xl bg-white/70 border border-green/30" />
+        <input type="datetime-local" defaultValue="2026-05-25T11:00" className="px-4 py-2.5 rounded-xl bg-white/70 border border-green/30" />
       </div>
       <button className="mt-5 px-8 py-3 rounded-xl bg-green-600 text-white">Submit Block Allocation</button>
     </div>
@@ -1384,19 +1384,88 @@ function BlockAllocation({ blocks }: { blocks: ReturnType<typeof makeBlocks> }) 
 }
 
 function BlockRequestApproval() {
-  const rows = [
-    { block: 'Khordha Block 2', type: 'Normal', quantity: 140, urgency: 'high' },
-    { block: 'Khordha Block 5', type: 'Sex Sorted', quantity: 80, urgency: 'medium' },
-    { block: 'Khordha Block 8', type: 'Normal', quantity: 220, urgency: 'critical' },
+  const [rows, setRows] = useState([
+    { id: 'SDVO-RQ-001', block: 'Khordha Block 2', type: 'Normal', quantity: 140, urgency: 'high', status: 'Pending' },
+    { id: 'SDVO-RQ-002', block: 'Khordha Block 5', type: 'Sex Sorted', quantity: 80, urgency: 'medium', status: 'Pending' },
+    { id: 'SDVO-RQ-003', block: 'Khordha Block 8', type: 'Normal', quantity: 220, urgency: 'critical', status: 'Pending' },
+  ]);
+  const [message, setMessage] = useState<{ type: 'success' | 'alert'; text: string } | null>(null);
+
+  const handleAction = (id: string, action: 'Approved' | 'Rejected' | 'Forwarded') => {
+    const selected = rows.find((row) => row.id === id);
+    setRows((items) => items.map((row) => (row.id === id ? { ...row, status: action } : row)));
+
+    if (action === 'Approved') {
+      setMessage({ type: 'success', text: `${selected?.block} approved. SDVO stock reservation completed and block notified.` });
+    } else if (action === 'Rejected') {
+      setMessage({ type: 'alert', text: `${selected?.block} request rejected. Rejection note sent to block inventory desk.` });
+    } else {
+      setMessage({ type: 'success', text: `${selected?.block} forwarded to Directorate for higher-level allocation approval.` });
+    }
+  };
+
+  const statusClass: Record<string, string> = {
+    Pending: 'bg-amber-50 text-amber-700 border-amber-200',
+    Approved: 'bg-green-50 text-green-700 border-green-200',
+    Rejected: 'bg-red-50 text-red-700 border-red-200',
+    Forwarded: 'bg-blue-50 text-blue-700 border-blue-200',
+  };
+
+  const urgencyClass: Record<string, string> = {
+    critical: 'bg-red-100 text-red-700',
+    high: 'bg-orange-100 text-orange-700',
+    medium: 'bg-amber-100 text-amber-700',
+  };
+
+  const actionStyles = [
+    { label: 'Approve', status: 'Approved' as const, className: 'bg-green-600 text-white hover:bg-green-700' },
+    { label: 'Reject', status: 'Rejected' as const, className: 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100' },
+    { label: 'Forward to Directorate', status: 'Forwarded' as const, className: 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100' },
   ];
+
   return (
     <div className="glass-card rounded-2xl p-6">
-      <SectionHeader eyebrow="S1-C-03" title="Restocking Request Approval: Block -> District" detail="Edit, approve, reject, or forward to Directorate with one click." />
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+        <SectionHeader eyebrow="" title="Restocking Request Approval: Block -> District" detail="Edit, approve, reject, or forward to Directorate with one click." />
+        <div className="text-right">
+          <p className="text-xs text-slate-500">Pending requests</p>
+          <p className="text-2xl font-mono text-slate-900">{rows.filter((row) => row.status === 'Pending').length}</p>
+        </div>
+      </div>
+      {message && (
+        <div className={`mb-4 flex items-start justify-between gap-3 rounded-xl border p-4 ${message.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
+          <div className="flex items-start gap-2">
+            {message.type === 'success' ? <CheckCircle2 size={18} className="mt-0.5 flex-shrink-0" /> : <AlertTriangle size={18} className="mt-0.5 flex-shrink-0" />}
+            <p className="text-sm font-medium">{message.text}</p>
+          </div>
+          <button onClick={() => setMessage(null)} className="text-xs font-semibold opacity-80 hover:opacity-100">Close</button>
+        </div>
+      )}
       <div className="space-y-3">
         {rows.map((row) => (
-          <div key={row.block} className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-xl bg-white/60 border border-white/30">
-            <div><p className="text-sm font-semibold text-slate-900">{row.block}</p><p className="text-xs text-slate-600">{row.type}, {row.quantity} doses, {row.urgency}</p></div>
-            <div className="flex gap-2"><button className="px-3 py-2 rounded-lg bg-green-50 text-green-700 text-sm">Approve</button><button className="px-3 py-2 rounded-lg bg-red-50 text-red-700 text-sm">Reject</button><button className="px-3 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm">Forward to Directorate</button></div>
+          <div key={row.id} className="rounded-xl bg-white/70 border border-white/40 p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <p className="text-sm font-semibold text-slate-900">{row.block}</p>
+                  <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${urgencyClass[row.urgency]}`}>{row.urgency}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold border ${statusClass[row.status]}`}>{row.status}</span>
+                </div>
+                <p className="text-xs text-slate-600">{row.type}, {row.quantity} doses, request ID {row.id}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {actionStyles.map((action) => (
+                  <button
+                    key={action.status}
+                    onClick={() => handleAction(row.id, action.status)}
+                    disabled={row.status === action.status}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${action.className}`}
+                  >
+                    {action.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -1411,7 +1480,7 @@ export function SDVOSemenPortal({ districts = odishaDistricts }: { districts?: D
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       <div className="glass-card-darker rounded-2xl p-6">
         <p className="text-sm text-green-700 mb-1">SDVO / Deputy Director Web Portal</p>
-        <h2 className="text-2xl text-slate-900 mb-1">S1-S-01 SDVO Inventory View</h2>
+        <h2 className="text-2xl text-slate-900 mb-1">SDVO Inventory View</h2>
         <p className="text-sm text-slate-600">SDVO-level stock summary with blocks under jurisdiction and forwarding workflow.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

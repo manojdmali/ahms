@@ -9,7 +9,7 @@ interface HeaderProps {
   onAiClick?: () => void;
 }
 
-const WEB_ROLES = ['directorate', 'cdvo', 'sdvo', 'bvo'];
+const WEB_ROLES = ['superadmin', 'directorate', 'cdvo', 'sdvo', 'bvo'];
 
 export function Header({ isCollapsed, onAiClick }: HeaderProps) {
   const { language, setLanguage } = useLanguage();
