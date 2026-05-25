@@ -16,6 +16,9 @@ import Settings from './pages/Settings';
 import SemenDashboard, { CDVOSemenPortal, DirectorateSemenScreen, SDVOSemenPortal } from './pages/SemenDashboard';
 import { BVOMedicineQueue, FarmerMedicineApp, LacMedicineMobileApp } from './pages/MedicineMobile';
 import { BVOMVUOperations, CDVOMVUOperations, DirectorateMVUOperations, MVUTeamMobileApp } from './pages/MVUOperations';
+import { AITMobileApp, FarmerSemenApp, AITScreen, FarmerSemenScreen } from './pages/AITMobileApp';
+import { MedicineDirectoratePortal, MedDirScreen } from './pages/MedicineDirectorate';
+import { CDVOMedicinePortal, BVOMedicinePortal, CDVOMedScreen, BVOMedScreen } from './pages/MedicineCDVO';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { DistrictProvider } from './contexts/DistrictContext';
@@ -23,7 +26,7 @@ import LoginPage from './pages/LoginPage';
 import { DistrictSemen, odishaDistricts } from './data/semenData';
 import { initialMedicineRequisitions, MedicineRequisition, MedicineStockItem, medicineStock } from './data/medicineMvuData';
 
-type Page = 'dashboard' | 'semen-dashboard' | 'semen-drilldown' | 'semen-allocation' | 'semen-redistribution' | 'semen-requests' | 'semen-reports' | 'semen-forecasting' | 'cdvo-semen' | 'sdvo-semen' | 'lac-medicine-home' | 'lac-medicine-log' | 'lac-medicine-farmer' | 'lac-medicine-barcode' | 'lac-medicine-request' | 'lac-medicine-inventory' | 'lac-medicine-offline' | 'farmer-medicine-login' | 'farmer-medicine-request' | 'farmer-medicine-history' | 'farmer-medicine-chatbot' | 'bvo-medicine-queue' | 'mvu-command' | 'mvu-compliance' | 'mvu-fleet' | 'mvu-manpower' | 'mvu-targets' | 'cdvo-mvu' | 'bvo-mvu-plan' | 'bvo-mvu-inventory' | 'bvo-mvu-assignment' | 'mvu-team-home' | 'mvu-team-visit' | 'mvu-team-daily' | 'mvu-team-stock' | 'livestock' | 'health' | 'breeding' | 'farmers' | 'dairy' | 'schemes' | 'insurance' | 'market' | 'training' | 'reports' | 'settings';
+type Page = 'dashboard' | 'semen-dashboard' | 'semen-drilldown' | 'semen-allocation' | 'semen-redistribution' | 'semen-requests' | 'semen-reports' | 'semen-forecasting' | 'cdvo-semen' | 'sdvo-semen' | 'lac-medicine-home' | 'lac-medicine-log' | 'lac-medicine-farmer' | 'lac-medicine-barcode' | 'lac-medicine-request' | 'lac-medicine-inventory' | 'lac-medicine-offline' | 'farmer-medicine-login' | 'farmer-medicine-request' | 'farmer-medicine-history' | 'farmer-medicine-chatbot' | 'bvo-medicine-queue' | 'mvu-command' | 'mvu-compliance' | 'mvu-fleet' | 'mvu-manpower' | 'mvu-targets' | 'cdvo-mvu' | 'bvo-mvu-plan' | 'bvo-mvu-inventory' | 'bvo-mvu-assignment' | 'mvu-team-home' | 'mvu-team-visit' | 'mvu-team-daily' | 'mvu-team-stock' | 'livestock' | 'health' | 'breeding' | 'farmers' | 'dairy' | 'schemes' | 'insurance' | 'market' | 'training' | 'reports' | 'settings' | 'ait-home' | 'ait-utilisation' | 'ait-restock' | 'ait-status' | 'ait-offline' | 'farmer-semen-login' | 'farmer-semen-request' | 'farmer-semen-history' | 'farmer-semen-chatbot' | 'med-dir-dashboard' | 'med-dir-ccd' | 'med-dir-allocation' | 'med-dir-redistribution' | 'med-dir-requisitions' | 'med-dir-analytics' | 'med-cdvo-dashboard' | 'med-cdvo-inventory' | 'med-cdvo-allocation' | 'med-cdvo-approval' | 'med-cdvo-analytics' | 'med-bvo-dashboard' | 'med-bvo-approval';
 
 const pageRoutes: Record<string, Page> = {
   '/semen/dashboard': 'semen-dashboard',
@@ -61,6 +64,28 @@ const pageRoutes: Record<string, Page> = {
   '/ahms/mvu-team/visit': 'mvu-team-visit',
   '/ahms/mvu-team/daily': 'mvu-team-daily',
   '/ahms/mvu-team/stock': 'mvu-team-stock',
+  '/ahms/ait/home': 'ait-home',
+  '/ahms/ait/utilisation': 'ait-utilisation',
+  '/ahms/ait/restock': 'ait-restock',
+  '/ahms/ait/status': 'ait-status',
+  '/ahms/ait/offline': 'ait-offline',
+  '/ahms/farmer/semen/login': 'farmer-semen-login',
+  '/ahms/farmer/semen/request': 'farmer-semen-request',
+  '/ahms/farmer/semen/history': 'farmer-semen-history',
+  '/ahms/farmer/semen/chatbot': 'farmer-semen-chatbot',
+  '/ahms/med/dir/dashboard': 'med-dir-dashboard',
+  '/ahms/med/dir/ccd': 'med-dir-ccd',
+  '/ahms/med/dir/allocation': 'med-dir-allocation',
+  '/ahms/med/dir/redistribution': 'med-dir-redistribution',
+  '/ahms/med/dir/requisitions': 'med-dir-requisitions',
+  '/ahms/med/dir/analytics': 'med-dir-analytics',
+  '/ahms/med/cdvo/dashboard': 'med-cdvo-dashboard',
+  '/ahms/med/cdvo/inventory': 'med-cdvo-inventory',
+  '/ahms/med/cdvo/allocation': 'med-cdvo-allocation',
+  '/ahms/med/cdvo/approval': 'med-cdvo-approval',
+  '/ahms/med/cdvo/analytics': 'med-cdvo-analytics',
+  '/ahms/med/bvo/dashboard': 'med-bvo-dashboard',
+  '/ahms/med/bvo/approval': 'med-bvo-approval',
   '/dashboard': 'dashboard',
   '/ahms/dashboard': 'dashboard',
 };
@@ -100,6 +125,28 @@ const routePaths: Partial<Record<Page, string>> = {
   'mvu-team-visit': '/ahms/mvu-team/visit',
   'mvu-team-daily': '/ahms/mvu-team/daily',
   'mvu-team-stock': '/ahms/mvu-team/stock',
+  'ait-home': '/ahms/ait/home',
+  'ait-utilisation': '/ahms/ait/utilisation',
+  'ait-restock': '/ahms/ait/restock',
+  'ait-status': '/ahms/ait/status',
+  'ait-offline': '/ahms/ait/offline',
+  'farmer-semen-login': '/ahms/farmer/semen/login',
+  'farmer-semen-request': '/ahms/farmer/semen/request',
+  'farmer-semen-history': '/ahms/farmer/semen/history',
+  'farmer-semen-chatbot': '/ahms/farmer/semen/chatbot',
+  'med-dir-dashboard': '/ahms/med/dir/dashboard',
+  'med-dir-ccd': '/ahms/med/dir/ccd',
+  'med-dir-allocation': '/ahms/med/dir/allocation',
+  'med-dir-redistribution': '/ahms/med/dir/redistribution',
+  'med-dir-requisitions': '/ahms/med/dir/requisitions',
+  'med-dir-analytics': '/ahms/med/dir/analytics',
+  'med-cdvo-dashboard': '/ahms/med/cdvo/dashboard',
+  'med-cdvo-inventory': '/ahms/med/cdvo/inventory',
+  'med-cdvo-allocation': '/ahms/med/cdvo/allocation',
+  'med-cdvo-approval': '/ahms/med/cdvo/approval',
+  'med-cdvo-analytics': '/ahms/med/cdvo/analytics',
+  'med-bvo-dashboard': '/ahms/med/bvo/dashboard',
+  'med-bvo-approval': '/ahms/med/bvo/approval',
   dashboard: '/ahms/dashboard',
 };
 
@@ -149,6 +196,43 @@ const mvuTeamScreens: Partial<Record<Page, Parameters<typeof MVUTeamMobileApp>[0
   'mvu-team-visit': 'visit',
   'mvu-team-daily': 'daily',
   'mvu-team-stock': 'stock',
+};
+
+const aitScreens: Partial<Record<Page, AITScreen>> = {
+  'ait-home': 'home',
+  'ait-utilisation': 'utilisation',
+  'ait-restock': 'restock',
+  'ait-status': 'status',
+  'ait-offline': 'offline',
+};
+
+const farmerSemenScreens: Partial<Record<Page, FarmerSemenScreen>> = {
+  'farmer-semen-login': 'login',
+  'farmer-semen-request': 'request',
+  'farmer-semen-history': 'history',
+  'farmer-semen-chatbot': 'chatbot',
+};
+
+const medDirScreens: Partial<Record<Page, MedDirScreen>> = {
+  'med-dir-dashboard': 'dashboard',
+  'med-dir-ccd': 'ccd',
+  'med-dir-allocation': 'allocation',
+  'med-dir-redistribution': 'redistribution',
+  'med-dir-requisitions': 'requisitions',
+  'med-dir-analytics': 'analytics',
+};
+
+const medCdvoScreens: Partial<Record<Page, CDVOMedScreen>> = {
+  'med-cdvo-dashboard': 'dashboard',
+  'med-cdvo-inventory': 'inventory',
+  'med-cdvo-allocation': 'allocation',
+  'med-cdvo-approval': 'approval',
+  'med-cdvo-analytics': 'analytics',
+};
+
+const medBvoScreens: Partial<Record<Page, BVOMedScreen>> = {
+  'med-bvo-dashboard': 'dashboard',
+  'med-bvo-approval': 'approval',
 };
 
 const getInitialPage = (fallback: string): Page => {

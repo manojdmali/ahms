@@ -25,11 +25,11 @@ export interface DairyCollection {
 export const dairyCollectionData: DairyCollection[] = [
   {
     id: "dc-001",
-    collectionId: "DC-2024120201",
+    collectionId: "DC-2026052001",
     farmerId: "f7b3c1a5-2d4e-4f8b-9c1a-5e6d7f8a9b0c",
     farmerName: "Ramesh Kumar Patel",
     farmerNameOdia: "ରମେଶ କୁମାର ପଟେଲ",
-    date: "2024-12-02",
+    date: "2026-05-20",
     session: "morning",
     quantity: 15.5,
     fat: 4.2,
@@ -42,16 +42,16 @@ export const dairyCollectionData: DairyCollection[] = [
     collectionCenter: "Balipatna Dairy Center",
     collectorName: "Suresh Kumar",
     status: "paid",
-    paymentDate: "2024-12-02",
+    paymentDate: "2026-05-20",
     paymentMode: "Bank Transfer"
   },
   {
     id: "dc-002",
-    collectionId: "DC-2024120202",
+    collectionId: "DC-2026052002",
     farmerId: "a8c4d2b6-3e5f-4g9c-0d2b-6f7e8g9a0c1d",
     farmerName: "Suresh Mohanty",
     farmerNameOdia: "ସୁରେଶ ମହାନ୍ତି",
-    date: "2024-12-02",
+    date: "2026-05-20",
     session: "morning",
     quantity: 22.0,
     fat: 3.8,
@@ -64,7 +64,7 @@ export const dairyCollectionData: DairyCollection[] = [
     collectionCenter: "Tangi Dairy Center",
     collectorName: "Prakash Sahoo",
     status: "paid",
-    paymentDate: "2024-12-02",
+    paymentDate: "2026-05-20",
     paymentMode: "Cash"
   },
   {
