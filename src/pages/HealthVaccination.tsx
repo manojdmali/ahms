@@ -96,7 +96,6 @@ const sampleHealthRecords = [
       nextDose: '2025-06-03'
     },
     temperature: 101.0,
-    status: 'completed' as const,
     cost: 250.00,
     notes: 'Vaccination administered successfully. Animal showed no adverse reactions. Next dose due in 6 months.',
     location: 'Khordha Block, Village Balakati'

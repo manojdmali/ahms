@@ -4,7 +4,7 @@
   import path from 'path';
 
   export default defineConfig({
-    base: '/ahms/',
+    base: '/ard/portal/',
     plugins: [react()],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
@@ -53,6 +53,25 @@
     build: {
       target: 'esnext',
       outDir: 'build',
+      chunkSizeWarningLimit: 1500,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            react: ['react', 'react-dom'],
+            charts: ['recharts'],
+            maps: ['leaflet', 'react-leaflet'],
+            motion: ['motion'],
+            ui: [
+              '@radix-ui/react-dialog',
+              '@radix-ui/react-dropdown-menu',
+              '@radix-ui/react-popover',
+              '@radix-ui/react-select',
+              '@radix-ui/react-tabs',
+              '@radix-ui/react-tooltip',
+            ],
+          },
+        },
+      },
     },
     server: {
       port: 3000,
