@@ -46,8 +46,8 @@ export default function OdishaMapCore({
   const getTooltipPosition = useCallback((e) => {
     const margin = 16;
     const edge = 8;
-    const tw = 320;
-    const th = 360;
+    const tw = Math.min(320, window.innerWidth - edge * 2);
+    const th = Math.min(360, window.innerHeight - edge * 2);
     let x = e.clientX + margin;
     let y = e.clientY + margin;
 

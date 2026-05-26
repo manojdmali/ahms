@@ -74,7 +74,7 @@ interface MVUMobileProps {
 const directorateScreens: Array<[DirectorateMVUScreen, string, string]> = [
   ['command', 'Command Dashboard', 'mvu-command'],
   ['compliance', 'Compliance Report', 'mvu-compliance'],
-  ['fleet', 'Fleet Edge', 'mvu-fleet'],
+  ['fleet', 'MVU Fleet Tracking', 'mvu-fleet'],
   ['manpower', 'Manpower', 'mvu-manpower'],
   ['targets', 'Targets', 'mvu-targets'],
 ];
@@ -344,7 +344,7 @@ function FleetPanel({ unit }: { unit: MVUUnit }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div className="glass-card rounded-2xl p-6">
-        <h3 className="text-slate-900 mb-2">Tata Fleet Edge Panel</h3><p className="text-sm text-slate-600 mb-4">{unit.id} past week route history. Idle period flagged on Thursday.</p>
+        <h3 className="text-slate-900 mb-2">Tatal Fleet Edge Panel</h3><p className="text-sm text-slate-600 mb-4">{unit.id} past week route history. Idle period flagged on Thursday.</p>
         <OdishaMapMock units={[unit]} />
       </div>
       <div className="glass-card rounded-2xl p-6">

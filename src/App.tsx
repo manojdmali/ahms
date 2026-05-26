@@ -450,7 +450,13 @@ function AhmsAiChatbot({
 function AppShell() {
   const { user } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [currentPage, setCurrentPage] = useState<Page>(getInitialPage(user?.homePath ?? 'dashboard'));
+  // Prioritise a farmer's, superadmin's, or BVO's configured homePath so they always
+  // land on their default first-visible menu after login, instead of
+  // inheriting the previous route from the URL.
+  const initialPage = user && (user.role === 'farmer' || user.role === 'superadmin' || user.role === 'bvo')
+    ? (user.homePath as Page)
+    : getInitialPage(user?.homePath ?? 'dashboard');
+  const [currentPage, setCurrentPage] = useState<Page>(initialPage);
   const [semenDistricts, setSemenDistricts] = useState<DistrictSemen[]>(odishaDistricts);
   const [medicineInventory, setMedicineInventory] = useState<MedicineStockItem[]>(medicineStock);
   const [medicineRequests, setMedicineRequests] = useState<MedicineRequisition[]>(initialMedicineRequisitions);
@@ -468,9 +474,17 @@ function AppShell() {
 
   useEffect(() => {
     if (user) {
+      // For farmer (end-user) logins we want to always open their default
+      // home menu rather than preserving the previous route left in the URL.
+      // For other roles, preserve behavior and only navigate when there's
+      // no explicit route in the address bar.
       const routedPage = pageRoutes[window.location.pathname];
-      if (!routedPage && user.homePath) {
-        navigateToPage(user.homePath as Page);
+      if (user.role === 'farmer' || user.role === 'superadmin' || user.role === 'bvo') {
+        if (user.homePath) navigateToPage(user.homePath as Page);
+      } else {
+        if (!routedPage && user.homePath) {
+          navigateToPage(user.homePath as Page);
+        }
       }
     }
   }, [user]);

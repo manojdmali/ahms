@@ -18,6 +18,19 @@ import {
   Info
 } from 'lucide-react';
 
+interface BlockAllocationRecord {
+  id: string;
+  recipientType: 'LAC' | 'AIT';
+  recipientName: string;
+  block: string;
+  district: string;
+  semenType: 'Normal' | 'Sex Sorted';
+  quantity: number;
+  allocatedAt: string;
+  status: 'Allocated' | 'In Transit' | 'Delivered';
+}
+
+
 interface BVOMedicineQueueProps {
   requisitions: MedicineRequisition[];
   onUpdateStatus?: (id: string, status: MedicineRequisition['status']) => void;
@@ -32,8 +45,60 @@ export default function BVOMedicineQueue({ requisitions, onUpdateStatus }: BVOMe
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null);
   const [isRejecting, setIsRejecting] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
+  const [allocationSearch, setAllocationSearch] = useState('');
+  const [allocationRecipientType, setAllocationRecipientType] = useState<'LAC' | 'AIT'>('LAC');
+  const [allocationRecipientName, setAllocationRecipientName] = useState('Khordha LAC-1');
+  const [allocationBlock, setAllocationBlock] = useState('Khordha Block 2');
+  const [allocationDistrict, setAllocationDistrict] = useState('Khordha');
+  const [allocationSemenType, setAllocationSemenType] = useState<'Normal' | 'Sex Sorted'>('Normal');
+  const [allocationQuantity, setAllocationQuantity] = useState(50);
+  const [recentAllocations, setRecentAllocations] = useState<BlockAllocationRecord[]>([
+    { id: 'ALOC-1001', recipientType: 'LAC', recipientName: 'Khordha LAC-1', block: 'Khordha Block 2', district: 'Khordha', semenType: 'Normal', quantity: 180, allocatedAt: '2026-05-24 13:15', status: 'Delivered' },
+    { id: 'ALOC-1002', recipientType: 'AIT', recipientName: 'Balasore AIT-1', block: 'Khordha Block 5', district: 'Khordha', semenType: 'Sex Sorted', quantity: 120, allocatedAt: '2026-05-24 09:30', status: 'In Transit' },
+    { id: 'ALOC-1003', recipientType: 'LAC', recipientName: 'Cuttack LAC-4', block: 'Cuttack Block 4', district: 'Cuttack', semenType: 'Normal', quantity: 200, allocatedAt: '2026-05-23 17:20', status: 'Delivered' },
+    { id: 'ALOC-1004', recipientType: 'AIT', recipientName: 'Ganjam AIT-2', block: 'Ganjam Block 1', district: 'Ganjam', semenType: 'Normal', quantity: 150, allocatedAt: '2026-05-23 11:05', status: 'Allocated' },
+    { id: 'ALOC-1005', recipientType: 'LAC', recipientName: 'Balasore LAC-2', block: 'Balasore Block 6', district: 'Balasore', semenType: 'Sex Sorted', quantity: 90, allocatedAt: '2026-05-22 15:40', status: 'In Transit' },
+  ]);
+  const allocationLacRecipients = ['Khordha LAC-1', 'Khordha LAC-2', 'Cuttack LAC-4', 'Balasore LAC-2', 'Ganjam LAC-3'];
+  const allocationAitRecipients = ['Balasore AIT-1', 'Sambalpur AIT-2', 'Cuttack AIT-1'];
+  const allocationRecipients = allocationRecipientType === 'LAC' ? allocationLacRecipients : allocationAitRecipients;
+  const allocationBlocks = ['Khordha Block 2', 'Khordha Block 5', 'Cuttack Block 4', 'Ganjam Block 1', 'Balasore Block 6'];
+  const allocationDistricts = ['Khordha', 'Cuttack', 'Ganjam', 'Balasore'];
 
-  // Clear toast after 3 seconds
+  const filteredAllocations = useMemo(() => {
+    return recentAllocations.filter((item) =>
+      item.block.toLowerCase().includes(allocationSearch.toLowerCase()) ||
+      item.district.toLowerCase().includes(allocationSearch.toLowerCase()) ||
+      item.semenType.toLowerCase().includes(allocationSearch.toLowerCase()) ||
+      item.status.toLowerCase().includes(allocationSearch.toLowerCase()) ||
+      item.recipientName.toLowerCase().includes(allocationSearch.toLowerCase()) ||
+      item.recipientType.toLowerCase().includes(allocationSearch.toLowerCase())
+    );
+  }, [allocationSearch, recentAllocations]);
+
+  const handleAllocateDose = () => {
+    if (!allocationRecipientName || allocationQuantity <= 0) {
+      setToast({ message: 'Please select a recipient and enter a valid quantity.', type: 'error' });
+      return;
+    }
+
+    const newAllocation: BlockAllocationRecord = {
+      id: `ALOC-${Math.floor(1000 + Math.random() * 9000)}`,
+      recipientType: allocationRecipientType,
+      recipientName: allocationRecipientName,
+      block: allocationBlock,
+      district: allocationDistrict,
+      semenType: allocationSemenType,
+      quantity: allocationQuantity,
+      allocatedAt: new Date().toISOString().replace('T', ' ').slice(0, 16),
+      status: 'Allocated',
+    };
+
+    setRecentAllocations((prev) => [newAllocation, ...prev]);
+    setToast({ message: `${allocationQuantity} doses allocated to ${allocationRecipientName}`, type: 'success' });
+    setAllocationQuantity(0);
+  };
+
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(null), 3000);
@@ -383,6 +448,172 @@ export default function BVOMedicineQueue({ requisitions, onUpdateStatus }: BVOMe
               <p>Try adjusting your search or filters.</p>
             </div>
           )}
+        </div>
+      </div>
+
+      <div className="glass-card rounded-2xl p-6 shadow-sm border border-slate-200/70 bg-slate-50">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div>
+            <p className="text-sm font-semibold text-slate-500 uppercase tracking-wide">Semen Dose Allocation</p>
+            <h3 className="text-xl font-bold text-slate-900">Allocate to LAC / AIT</h3>
+          </div>
+          <div className="relative w-full max-w-sm">
+            <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search allocations by recipient, block, district or status..."
+              value={allocationSearch}
+              onChange={(e) => setAllocationSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
+            />
+          </div>
+        </div>
+
+        <div className="rounded-3xl bg-white shadow-sm border border-slate-200/70 p-5 mb-6">
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <h4 className="text-lg font-semibold text-slate-900 flex-1">Allocate Semen Dose</h4>
+            <span className="text-sm text-slate-500">Assign doses directly to a LAC or AIT.</span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setAllocationRecipientType('LAC');
+                  setAllocationRecipientName(allocationLacRecipients[0]);
+                }}
+                className={`flex-1 py-2 rounded-xl border font-medium transition ${allocationRecipientType === 'LAC' ? 'bg-green-600 text-white border-green-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
+              >
+                LAC
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAllocationRecipientType('AIT');
+                  setAllocationRecipientName(allocationAitRecipients[0]);
+                }}
+                className={`flex-1 py-2 rounded-xl border font-medium transition ${allocationRecipientType === 'AIT' ? 'bg-green-600 text-white border-green-600' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}
+              >
+                AIT
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Recipient</label>
+              <select
+                value={allocationRecipientName}
+                onChange={(e) => setAllocationRecipientName(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500/20"
+              >
+                {allocationRecipients.map((recipient) => (
+                  <option key={recipient} value={recipient}>{recipient}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">District</label>
+              <select
+                value={allocationDistrict}
+                onChange={(e) => setAllocationDistrict(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500/20"
+              >
+                {allocationDistricts.map((district) => (
+                  <option key={district} value={district}>{district}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Block</label>
+              <select
+                value={allocationBlock}
+                onChange={(e) => setAllocationBlock(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500/20"
+              >
+                {allocationBlocks.map((block) => (
+                  <option key={block} value={block}>{block}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Semen Type</label>
+              <select
+                value={allocationSemenType}
+                onChange={(e) => setAllocationSemenType(e.target.value as 'Normal' | 'Sex Sorted')}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500/20"
+              >
+                <option value="Normal">Normal</option>
+                <option value="Sex Sorted">Sex Sorted</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Quantity</label>
+              <input
+                type="number"
+                min={1}
+                value={allocationQuantity}
+                onChange={(e) => setAllocationQuantity(Number(e.target.value))}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500/20"
+              />
+            </div>
+
+            <div className="flex items-end">
+              <button
+                type="button"
+                onClick={handleAllocateDose}
+                className="w-full py-3 rounded-2xl bg-green-600 text-white font-semibold shadow-sm hover:bg-green-700 transition-colors"
+              >
+                Allocate Dose
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm text-left">
+            <thead>
+              <tr className="border-b border-slate-200 text-slate-600">
+                <th className="py-3 px-4 font-semibold">Allocation ID</th>
+                <th className="py-3 px-4 font-semibold">Recipient</th>
+                <th className="py-3 px-4 font-semibold">Type</th>
+                <th className="py-3 px-4 font-semibold">Block</th>
+                <th className="py-3 px-4 font-semibold">District</th>
+                <th className="py-3 px-4 font-semibold">Semen Type</th>
+                <th className="py-3 px-4 font-semibold">Quantity</th>
+                <th className="py-3 px-4 font-semibold">Allocated At</th>
+                <th className="py-3 px-4 font-semibold">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredAllocations.map((record) => (
+                <tr key={record.id} className="border-b border-slate-100 hover:bg-white transition-colors">
+                  <td className="py-3 px-4 font-mono text-slate-900">{record.id}</td>
+                  <td className="py-3 px-4 text-slate-900">{record.recipientName}</td>
+                  <td className="py-3 px-4 text-slate-700">{record.recipientType}</td>
+                  <td className="py-3 px-4 text-slate-900">{record.block}</td>
+                  <td className="py-3 px-4 text-slate-700">{record.district}</td>
+                  <td className="py-3 px-4 text-slate-700">{record.semenType}</td>
+                  <td className="py-3 px-4 font-semibold text-slate-900">{record.quantity}</td>
+                  <td className="py-3 px-4 text-slate-600">{record.allocatedAt}</td>
+                  <td className="py-3 px-4">
+                    <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                      record.status === 'Delivered' ? 'bg-green-100 text-green-700 border border-green-200' :
+                      record.status === 'In Transit' ? 'bg-blue-100 text-blue-700 border border-blue-200' :
+                      'bg-amber-100 text-amber-700 border border-amber-200'
+                    }`}>
+                      {record.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </motion.div>

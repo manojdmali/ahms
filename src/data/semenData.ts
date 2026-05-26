@@ -79,3 +79,27 @@ export const anomalyAlerts = [
   { id: 'A2', lac: 'LAC Cuttack-7',     district: 'Cuttack',  doses: 31, window: '90 min',   severity: 'high',     time: '09:15 AM' },
   { id: 'A3', lac: 'LAC Puri-2',        district: 'Puri',     doses: 22, window: '3 hours',  severity: 'medium',   time: 'Yesterday' },
 ];
+
+export interface AllocationHistory {
+  id: string;
+  district: string;
+  block: string;
+  semenType: 'Normal' | 'Sex Sorted';
+  animalType: 'Cattle' | 'Buffalo' | 'Mixed';
+  quantity: number;
+  allocatedDate: string;
+  allocatedTime: string;
+  status: 'Allocated' | 'In Transit' | 'Received' | 'Pending';
+  allocatedBy: string;
+}
+
+export const allocationHistory: AllocationHistory[] = [
+  { id: 'ALO-KHD-2026-001', district: 'Khordha', block: 'Khordha Block 1', semenType: 'Normal', animalType: 'Cattle', quantity: 200, allocatedDate: '2026-05-25', allocatedTime: '14:30', status: 'Received', allocatedBy: 'CDVO Khordha' },
+  { id: 'ALO-KHD-2026-002', district: 'Khordha', block: 'Khordha Block 3', semenType: 'Sex Sorted', animalType: 'Cattle', quantity: 150, allocatedDate: '2026-05-25', allocatedTime: '12:15', status: 'In Transit', allocatedBy: 'CDVO Khordha' },
+  { id: 'ALO-KHD-2026-003', district: 'Khordha', block: 'Khordha Block 2', semenType: 'Normal', animalType: 'Buffalo', quantity: 180, allocatedDate: '2026-05-24', allocatedTime: '16:45', status: 'Received', allocatedBy: 'CDVO Khordha' },
+  { id: 'ALO-KHD-2026-004', district: 'Khordha', block: 'Khordha Block 5', semenType: 'Sex Sorted', animalType: 'Cattle', quantity: 120, allocatedDate: '2026-05-24', allocatedTime: '10:20', status: 'Received', allocatedBy: 'CDVO Khordha' },
+  { id: 'ALO-KHD-2026-005', district: 'Khordha', block: 'Khordha Block 4', semenType: 'Normal', animalType: 'Mixed', quantity: 220, allocatedDate: '2026-05-23', allocatedTime: '15:00', status: 'Received', allocatedBy: 'CDVO Khordha' },
+  { id: 'ALO-CTK-2026-001', district: 'Cuttack', block: 'Cuttack Block 2', semenType: 'Normal', animalType: 'Cattle', quantity: 250, allocatedDate: '2026-05-25', allocatedTime: '13:45', status: 'Received', allocatedBy: 'CDVO Cuttack' },
+  { id: 'ALO-CTK-2026-002', district: 'Cuttack', block: 'Cuttack Block 7', semenType: 'Sex Sorted', animalType: 'Buffalo', quantity: 100, allocatedDate: '2026-05-25', allocatedTime: '11:30', status: 'In Transit', allocatedBy: 'CDVO Cuttack' },
+  { id: 'ALO-PUR-2026-001', district: 'Puri', block: 'Puri Block 1', semenType: 'Normal', animalType: 'Cattle', quantity: 160, allocatedDate: '2026-05-24', allocatedTime: '14:15', status: 'Received', allocatedBy: 'CDVO Puri' },
+];

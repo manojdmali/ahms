@@ -64,8 +64,8 @@ export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNa
     { icon: <Home size={20} />, labelEn: 'Dashboard', labelHi: 'डैशबोर्ड', labelOd: 'ଡ୍ୟାସବୋର୍ଡ', path: 'dashboard', active: true },
     { icon: <Map size={20} />, labelEn: 'Semen Dashboard', labelHi: 'Semen Dashboard', labelOd: 'Semen Dashboard', path: 'semen-dashboard' },
     { icon: <Warehouse size={20} />, labelEn: 'District Drilldown', labelHi: 'District Drilldown', labelOd: 'District Drilldown', path: 'semen-drilldown' },
-    { icon: <Syringe size={20} />, labelEn: 'Semen Allocation', labelHi: 'Semen Allocation', labelOd: 'Semen Allocation', path: 'semen-allocation' },
-    { icon: <ArrowRightLeft size={20} />, labelEn: 'Redistribution', labelHi: 'Redistribution', labelOd: 'Redistribution', path: 'semen-redistribution' },
+    { icon: <Syringe size={20} />, labelEn: 'District-wise allocation', labelHi: 'District-wise allocation', labelOd: 'District-wise allocation', path: 'semen-allocation' },
+    { icon: <ArrowRightLeft size={20} />, labelEn: 'Stock Redistribution', labelHi: 'Stock Redistribution', labelOd: 'Stock Redistribution', path: 'semen-redistribution' },
     { icon: <ClipboardList size={20} />, labelEn: 'Restocking Requests', labelHi: 'Restocking Requests', labelOd: 'Restocking Requests', path: 'semen-requests' },
     { icon: <BarChart3 size={20} />, labelEn: 'Semen Reports', labelHi: 'Semen Reports', labelOd: 'Semen Reports', path: 'semen-reports' },
     { icon: <Sparkles size={20} />, labelEn: 'AI Forecasting', labelHi: 'AI Forecasting', labelOd: 'AI Forecasting', path: 'semen-forecasting' },
@@ -85,7 +85,7 @@ export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNa
     { icon: <AlertTriangle size={20} />, labelEn: 'BVO Medicine Queue', labelHi: 'BVO Medicine Queue', labelOd: 'BVO Medicine Queue', path: 'bvo-medicine-queue' },
     { icon: <Truck size={20} />, labelEn: 'MVU Command', labelHi: 'MVU Command', labelOd: 'MVU Command', path: 'mvu-command' },
     { icon: <ClipboardList size={20} />, labelEn: 'MVU Compliance', labelHi: 'MVU Compliance', labelOd: 'MVU Compliance', path: 'mvu-compliance' },
-    { icon: <Route size={20} />, labelEn: 'Fleet Edge', labelHi: 'Fleet Edge', labelOd: 'Fleet Edge', path: 'mvu-fleet' },
+    { icon: <Route size={20} />, labelEn: 'MVU Fleet Tracking', labelHi: 'MVU Fleet Tracking', labelOd: 'MVU Fleet Tracking', path: 'mvu-fleet' },
     { icon: <Users size={20} />, labelEn: 'MVU Manpower', labelHi: 'MVU Manpower', labelOd: 'MVU Manpower', path: 'mvu-manpower' },
     { icon: <BarChart3 size={20} />, labelEn: 'MVU Targets', labelHi: 'MVU Targets', labelOd: 'MVU Targets', path: 'mvu-targets' },
     { icon: <Truck size={20} />, labelEn: 'CDVO MVU', labelHi: 'CDVO MVU', labelOd: 'CDVO MVU', path: 'cdvo-mvu' },
@@ -138,7 +138,7 @@ export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNa
             </div>
             <div>
               <h1 className={`text-slate-800 font-semibold ${language === 'od' ? 'font-odia' : ''}`}>
-                {t('AHMS', 'AHMS', 'AHMS')}
+                {t('ARD', 'एआरडी', 'ARD')}
               </h1>
               <p className={`text-xs text-slate-600 ${language === 'od' ? 'font-odia' : ''}`}>
                 {t('Odisha', 'ओडिशा', 'ଓଡିଶା')}

@@ -43,6 +43,7 @@ import {
   YAxis,
 } from 'recharts';
 import {
+  allocationHistory,
   anomalyAlerts,
   DistrictSemen,
   forecastData,
@@ -81,11 +82,40 @@ interface RequestRow {
   vendor?: string;
 }
 
+interface AllocationLogRow {
+  id: string;
+  district: string;
+  semenType: string;
+  animalType: string;
+  mode: 'numbers' | 'percent';
+  inputQuantity: number;
+  allocatedQty: number;
+  pickupSlot: string;
+  beforeStock: number;
+  afterStock: number;
+  status: string;
+}
+
+interface RedistributionLogRow {
+  id: string;
+  donor: string;
+  recipient: string;
+  mode: 'numbers' | 'percent';
+  inputQuantity: number;
+  transferQty: number;
+  pickupPlan: string;
+  donorBefore: number;
+  donorAfter: number;
+  recipientBefore: number;
+  recipientAfter: number;
+  status: string;
+}
+
 const screenMeta: Record<DirectorateSemenScreen, { id: string; label: string; page: string }> = {
-  state: { id: 'S1-D-01', label: 'State Dashboard', page: 'semen-dashboard' },
+  state: { id: 'S1-D-01', label: 'Semen Dashboard', page: 'semen-dashboard' },
   drilldown: { id: 'S1-D-02', label: 'District Drilldown', page: 'semen-drilldown' },
-  allocation: { id: 'S1-D-03', label: 'District Allocation', page: 'semen-allocation' },
-  redistribution: { id: 'S1-D-04', label: 'Redistribution', page: 'semen-redistribution' },
+  allocation: { id: 'S1-D-03', label: 'District-wise allocation', page: 'semen-allocation' },
+  redistribution: { id: 'S1-D-04', label: 'Stock Redistribution', page: 'semen-redistribution' },
   requests: { id: 'S1-D-05', label: 'Restocking Requests', page: 'semen-requests' },
   reports: { id: 'S1-D-06', label: 'Reports', page: 'semen-reports' },
   forecasting: { id: 'S1-D-07', label: 'AI Forecasting', page: 'semen-forecasting' },
@@ -97,6 +127,65 @@ const animalTypes = ['Cattle', 'Buffalo'];
 
 const formatNumber = (value: number) => new Intl.NumberFormat('en-IN').format(Math.round(value));
 const pct = (value: number) => `${Math.round(value)}%`;
+
+const makeAllocationHistory = (districts: DistrictSemen[]): AllocationLogRow[] => {
+  const rows = [
+    { district: 'Khordha', semenType: 'Normal', animalType: 'Cattle', mode: 'numbers' as const, inputQuantity: 650, pickupSlot: '2026-05-24 09:30', status: 'Submitted' },
+    { district: 'Puri', semenType: 'Sex Sorted', animalType: 'Cattle', mode: 'numbers' as const, inputQuantity: 280, pickupSlot: '2026-05-23 12:00', status: 'Submitted' },
+    { district: 'Sambalpur', semenType: 'Normal', animalType: 'Buffalo', mode: 'percent' as const, inputQuantity: 1, pickupSlot: '2026-05-22 15:30', status: 'Submitted' },
+  ];
+
+  return rows.map((row, index) => {
+    const district = districts.find((item) => item.name === row.district) ?? districts[index] ?? districts[0];
+    const allocatedQty = row.mode === 'percent' ? Math.round((50000 * row.inputQuantity) / 100) : row.inputQuantity;
+    const afterStock = district?.stock ?? allocatedQty;
+    const beforeStock = Math.max(0, afterStock - allocatedQty);
+
+    return {
+      id: `ALLOC-${String(index + 1).padStart(3, '0')}`,
+      district: district?.name ?? row.district,
+      semenType: row.semenType,
+      animalType: row.animalType,
+      mode: row.mode,
+      inputQuantity: row.inputQuantity,
+      allocatedQty,
+      pickupSlot: row.pickupSlot,
+      beforeStock,
+      afterStock,
+      status: row.status,
+    };
+  });
+};
+
+const makeRedistributionHistory = (districts: DistrictSemen[]): RedistributionLogRow[] => {
+  const rows = [
+    { donor: 'Balasore', recipient: 'Cuttack', mode: 'numbers' as const, inputQuantity: 400, pickupPlan: 'Single pickup slot', status: 'Confirmed' },
+    { donor: 'Mayurbhanj', recipient: 'Gajapati', mode: 'numbers' as const, inputQuantity: 260, pickupPlan: 'Split: 10:00, 13:00, 16:00', status: 'Confirmed' },
+  ];
+
+  return rows.map((row, index) => {
+    const donor = districts.find((item) => item.name === row.donor) ?? districts[index] ?? districts[0];
+    const recipient = districts.find((item) => item.name === row.recipient) ?? districts[index + 1] ?? districts[0];
+    const transferQty = row.mode === 'percent' ? Math.round(((donor?.stock ?? 0) * row.inputQuantity) / 100) : row.inputQuantity;
+    const donorAfter = donor?.stock ?? 0;
+    const recipientAfter = recipient?.stock ?? transferQty;
+
+    return {
+      id: `REDIST-${String(index + 1).padStart(3, '0')}`,
+      donor: donor?.name ?? row.donor,
+      recipient: recipient?.name ?? row.recipient,
+      mode: row.mode,
+      inputQuantity: row.inputQuantity,
+      transferQty,
+      pickupPlan: row.pickupPlan,
+      donorBefore: donorAfter + transferQty,
+      donorAfter,
+      recipientBefore: Math.max(0, recipientAfter - transferQty),
+      recipientAfter,
+      status: row.status,
+    };
+  });
+};
 
 const getStockRatio = (district: DistrictSemen) => district.stock / Math.max(district.allocated, 1);
 
@@ -207,8 +296,8 @@ function DirectorateShell({
     <div className="glass-card-darker rounded-2xl p-6">
       <div className="flex items-center justify-between gap-4 mb-5">
         <div>
-          <p className="text-sm text-green-700 mb-1">Directorate Semen Control Room</p>
-          <h2 className="text-2xl text-slate-900 mb-1">Odisha Semen Stock & Forecasting Flow</h2>
+          <p className="text-sm text-green-700 mb-1">Directorate Semen Command Centre</p>
+          <h2 className="text-2xl text-slate-900 mb-1">State-Level Semen Inventory & Forecast View</h2>
           <p className="text-sm text-slate-600">All Directorate semen screens mapped for demo navigation.</p>
         </div>
 
@@ -313,7 +402,7 @@ function StateDashboard({
         </div>
 
         <div className="glass-card rounded-2xl p-6">
-          <SectionHeader eyebrow="AI MOMENT" title="AI Stock-Out Alert Cards" detail="Priority districts for replenishment or redistribution." />
+          <SectionHeader eyebrow="AI Early Warnings" title="AI Stock-Out Alert Cards" detail="Priority districts for replenishment or redistribution." />
           <div className="space-y-3">
             {stockoutAlerts.map((district) => {
               const isCritical = (district.daysToStockout ?? 99) <= 10;
@@ -449,21 +538,39 @@ function AllocationScreen({ districts, onDistrictsChange }: { districts: Distric
   const [pickupDate, setPickupDate] = useState('2026-05-25');
   const [pickupTime, setPickupTime] = useState('10:30');
   const [message, setMessage] = useState('');
+  const [allocationRows, setAllocationRows] = useState<AllocationLogRow[]>(() => makeAllocationHistory(districts));
   const fsbStock = 50000;
   const district = districts.find((item) => item.name === districtName) ?? districts[0];
   const allocationQty = mode === 'percent' ? Math.round((fsbStock * quantity) / 100) : quantity;
 
   const submitAllocation = () => {
     onDistrictsChange(updateDistrictStock(districts, districtName, allocationQty));
+    setAllocationRows((rows) => [
+      {
+        id: `ALLOC-${String(rows.length + 1).padStart(3, '0')}`,
+        district: districtName,
+        semenType,
+        animalType,
+        mode,
+        inputQuantity: quantity,
+        allocatedQty: allocationQty,
+        pickupSlot: `${pickupDate} ${pickupTime}`,
+        beforeStock: district.stock,
+        afterStock: district.stock + allocationQty,
+        status: 'Submitted',
+      },
+      ...rows,
+    ]);
     setMessage(`${formatNumber(allocationQty)} ${semenType} ${animalType} doses allocated to ${districtName}. Stock rises from ${formatNumber(district.stock)} to ${formatNumber(district.stock + allocationQty)}.`);
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="glass-card rounded-2xl p-6 lg:col-span-2">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="glass-card rounded-2xl p-5 lg:col-span-2">
         <SectionHeader eyebrow="" title="Semen Allocation to Districts" detail="Allocate state FSB stock with pickup slot. Submit updates district inventory instantly." />
         
-        <div className="space-y-6 mt-6">
+        <div className="space-y-4 mt-4">
           {/* District & Semen Selection */}
           <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200">
             <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
@@ -547,31 +654,82 @@ function AllocationScreen({ districts, onDistrictsChange }: { districts: Distric
           Submit Allocation
         </button>
         {message && <div className="mt-4 p-4 rounded-xl bg-green-50 border border-green-200 text-sm text-green-800">{message}</div>}
+
       </div>
 
-      <div className="glass-card rounded-2xl p-6">
-        <SectionHeader eyebrow="PREVIEW" title="Live Inventory Impact" detail="Real-time stock change preview" />
-        <div className="space-y-4">
+      <div className="glass-card rounded-2xl p-5">
+        <SectionHeader eyebrow="PREVIEW" title="Live Inventory Impact" detail="Compact stock impact before you submit." />
+        <div className="grid grid-cols-3 gap-2">
+          <div className="p-3 rounded-xl bg-white/70 border border-white/40">
+            <p className="text-xs text-slate-500 font-semibold uppercase">Before</p>
+            <p className="text-xl font-mono text-slate-900 mt-1">{formatNumber(district.stock)}</p>
+          </div>
+          <div className="p-3 rounded-xl bg-green-50 border border-green-200">
+            <p className="text-xs text-green-700 font-semibold uppercase">Add</p>
+            <p className="text-xl font-mono text-green-700 mt-1">+{formatNumber(allocationQty)}</p>
+          </div>
+          <div className="p-3 rounded-xl bg-green-50 border border-green-200">
+            <p className="text-xs text-green-700 font-semibold uppercase">After</p>
+            <p className="text-xl font-mono text-green-800 mt-1">{formatNumber(district.stock + allocationQty)}</p>
+          </div>
+        </div>
+        <div className="mt-3 p-3 rounded-xl bg-white/60 border border-white/30 text-sm">
+          <p className="font-semibold text-slate-900">{district.name}</p>
+          <p className="text-xs text-slate-600 mt-1">{semenType} {animalType} - pickup {pickupDate} at {pickupTime}</p>
+        </div>
+      </div>
+      </div>
+
+      <div className="glass-card rounded-2xl p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
           <div>
-            <p className="text-xs text-slate-600 uppercase font-semibold mb-2">Current Stock</p>
-            <div className="p-4 rounded-xl bg-white/60 border border-white/30">
-              <p className="text-3xl font-bold text-slate-900">{formatNumber(district.stock)}</p>
-              <p className="text-xs text-slate-600 mt-1">{district.name}</p>
-            </div>
+            <p className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+              <Table2 size={16} className="text-green-700" />
+              Allocation History
+            </p>
+            <p className="text-xs text-slate-600 mt-1">Past allocation data plus new submissions from this screen.</p>
           </div>
-          <div className="flex items-center justify-center">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-green-100 text-green-700 font-semibold text-sm">
-              <Send size={14} />
-              +{formatNumber(allocationQty)}
-            </div>
-          </div>
-          <div>
-            <p className="text-xs text-slate-600 uppercase font-semibold mb-2">After Allocation</p>
-            <div className="p-4 rounded-xl bg-green-50 border border-green-300">
-              <p className="text-3xl font-bold text-green-800">{formatNumber(district.stock + allocationQty)}</p>
-              <p className="text-xs text-green-700 mt-1">Pickup: {pickupDate} @ {pickupTime}</p>
-            </div>
-          </div>
+          <span className="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold border border-green-200">
+            {allocationRows.length} records
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full" style={{ minWidth: 760 }}>
+            <thead>
+              <tr className="text-left text-xs uppercase text-slate-600 border-b border-white/40">
+                <th className="py-2.5 px-3">ID / Pickup</th>
+                <th className="py-2.5 px-3">District & Type</th>
+                <th className="py-2.5 px-3 text-right">Quantity</th>
+                <th className="py-2.5 px-3">Stock Impact</th>
+                <th className="py-2.5 px-3">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {allocationRows.map((row) => (
+                <tr key={row.id} className="border-b border-white/30 hover:bg-white/40 transition-colors">
+                  <td className="py-3 px-3">
+                    <p className="text-sm font-mono text-slate-900">{row.id}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{row.pickupSlot}</p>
+                  </td>
+                  <td className="py-3 px-3">
+                    <p className="text-sm font-semibold text-slate-900">{row.district}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{row.semenType} - {row.animalType}</p>
+                  </td>
+                  <td className="py-3 px-3 text-right">
+                    <p className="text-sm font-mono text-slate-900">{formatNumber(row.allocatedQty)}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{row.mode === 'percent' ? `${row.inputQuantity}% FSB` : 'Numbers'}</p>
+                  </td>
+                  <td className="py-3 px-3">
+                    <p className="text-sm font-mono text-slate-700">{formatNumber(row.beforeStock)}{' -> '}<span className="text-green-700">{formatNumber(row.afterStock)}</span></p>
+                  </td>
+                  <td className="py-3 px-3">
+                    <span className="px-2 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold border border-green-200">{row.status}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -585,6 +743,7 @@ function RedistributionScreen({ districts, onDistrictsChange }: { districts: Dis
   const [quantity, setQuantity] = useState(400);
   const [multiSlot, setMultiSlot] = useState(false);
   const [message, setMessage] = useState('');
+  const [redistributionRows, setRedistributionRows] = useState<RedistributionLogRow[]>(() => makeRedistributionHistory(districts));
   const donor = districts.find((item) => item.name === donorName) ?? districts[0];
   const recipient = districts.find((item) => item.name === recipientName) ?? districts[1];
   const transferQty = mode === 'percent' ? Math.round((donor.stock * quantity) / 100) : quantity;
@@ -593,16 +752,34 @@ function RedistributionScreen({ districts, onDistrictsChange }: { districts: Dis
     const afterDonor = updateDistrictStock(districts, donorName, -transferQty);
     const afterBoth = updateDistrictStock(afterDonor, recipientName, transferQty);
     onDistrictsChange(afterBoth);
+    setRedistributionRows((rows) => [
+      {
+        id: `REDIST-${String(rows.length + 1).padStart(3, '0')}`,
+        donor: donorName,
+        recipient: recipientName,
+        mode,
+        inputQuantity: quantity,
+        transferQty,
+        pickupPlan: multiSlot ? 'Split: 10:00, 13:00, 16:00' : 'Single pickup slot',
+        donorBefore: donor.stock,
+        donorAfter: Math.max(0, donor.stock - transferQty),
+        recipientBefore: recipient.stock,
+        recipientAfter: recipient.stock + transferQty,
+        status: 'Confirmed',
+      },
+      ...rows,
+    ]);
     setMessage(`${formatNumber(transferQty)} doses moved from ${donorName} to ${recipientName}. Both district stocks updated instantly.`);
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="glass-card rounded-2xl p-6 lg:col-span-2">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="glass-card rounded-2xl p-5 lg:col-span-2">
         <SectionHeader eyebrow="" title="Redistribution Between Districts" detail="Move surplus stock from donor districts to deficit districts." />
         
         {/* AI Suggestion */}
-        <div className="p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-300 mb-6 flex items-start gap-3">
+        <div className="p-4 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border border-green-300 mb-4 flex items-start gap-3">
           <Sparkles className="text-green-700 mt-0.5 flex-shrink-0" size={20} />
           <div>
             <p className="text-sm font-semibold text-green-900">💡 AI Recommendation</p>
@@ -611,7 +788,7 @@ function RedistributionScreen({ districts, onDistrictsChange }: { districts: Dis
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Donor District */}
           <div className="p-4 rounded-xl bg-gradient-to-br from-red-50 to-orange-50 border border-red-200">
             <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
@@ -705,57 +882,90 @@ function RedistributionScreen({ districts, onDistrictsChange }: { districts: Dis
           Confirm Redistribution
         </button>
         {message && <div className="mt-4 p-4 rounded-xl bg-green-50 border border-green-200 text-sm text-green-800">{message}</div>}
+
       </div>
 
-      <div className="glass-card rounded-2xl p-6">
+      <div className="glass-card rounded-2xl p-5">
         <SectionHeader eyebrow="LIVE BALANCE" title="Before & After Impact" detail={multiSlot ? 'Pickup slots: 10:00, 13:00, 16:00' : 'Single pickup slot'} />
-        
-        <div className="space-y-4">
-          {/* Donor Changes */}
-          <div>
-            <p className="text-xs text-slate-600 uppercase font-semibold mb-2 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-red-500"></span>
-              {donor.name} (Donor)
-            </p>
-            <div className="p-4 rounded-xl bg-red-50 border border-red-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-slate-700">Before</span>
-                <span className="font-bold text-red-800">{formatNumber(donor.stock)}</span>
-              </div>
-              <div className="flex items-center gap-2 my-2">
-                <div className="flex-1 h-0.5 bg-red-300"></div>
-                <span className="text-xs text-red-600 font-semibold">-{formatNumber(transferQty)}</span>
-                <div className="flex-1 h-0.5 bg-red-300"></div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-700">After</span>
-                <span className="font-bold text-red-800">{formatNumber(Math.max(0, donor.stock - transferQty))}</span>
-              </div>
+        <div className="space-y-3">
+          <div className="p-3 rounded-xl bg-red-50 border border-red-200">
+            <p className="text-xs text-red-700 uppercase font-semibold">{donor.name} donor</p>
+            <div className="grid grid-cols-3 gap-2 mt-2 text-sm">
+              <span className="font-mono text-slate-800">{formatNumber(donor.stock)}</span>
+              <span className="font-mono text-red-700">-{formatNumber(transferQty)}</span>
+              <span className="font-mono text-red-800">{formatNumber(Math.max(0, donor.stock - transferQty))}</span>
             </div>
           </div>
+          <div className="p-3 rounded-xl bg-green-50 border border-green-200">
+            <p className="text-xs text-green-700 uppercase font-semibold">{recipient.name} recipient</p>
+            <div className="grid grid-cols-3 gap-2 mt-2 text-sm">
+              <span className="font-mono text-slate-800">{formatNumber(recipient.stock)}</span>
+              <span className="font-mono text-green-700">+{formatNumber(transferQty)}</span>
+              <span className="font-mono text-green-800">{formatNumber(recipient.stock + transferQty)}</span>
+            </div>
+          </div>
+          <div className="p-3 rounded-xl bg-white/60 border border-white/30">
+            <p className="text-xs font-semibold text-slate-700">Transfer plan</p>
+            <p className="text-xs text-slate-600 mt-1">{mode === 'percent' ? `${quantity}% of donor stock` : `${formatNumber(transferQty)} doses`} - {multiSlot ? 'split pickup' : 'single pickup'}</p>
+          </div>
+        </div>
+      </div>
+      </div>
 
-          {/* Recipient Changes */}
+      <div className="glass-card rounded-2xl p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
           <div>
-            <p className="text-xs text-slate-600 uppercase font-semibold mb-2 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-green-500"></span>
-              {recipient.name} (Recipient)
+            <p className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+              <Table2 size={16} className="text-green-700" />
+              Redistribution History
             </p>
-            <div className="p-4 rounded-xl bg-green-50 border border-green-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-slate-700">Before</span>
-                <span className="font-bold text-green-800">{formatNumber(recipient.stock)}</span>
-              </div>
-              <div className="flex items-center gap-2 my-2">
-                <div className="flex-1 h-0.5 bg-green-300"></div>
-                <span className="text-xs text-green-600 font-semibold">+{formatNumber(transferQty)}</span>
-                <div className="flex-1 h-0.5 bg-green-300"></div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-700">After</span>
-                <span className="font-bold text-green-800">{formatNumber(recipient.stock + transferQty)}</span>
-              </div>
-            </div>
+            <p className="text-xs text-slate-600 mt-1">Past redistributions plus new confirmations from this screen.</p>
           </div>
+          <span className="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold border border-green-200">
+            {redistributionRows.length} records
+          </span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full" style={{ minWidth: 860 }}>
+            <thead>
+              <tr className="text-left text-xs uppercase text-slate-600 border-b border-white/40">
+                <th className="py-2.5 px-3">ID / Plan</th>
+                <th className="py-2.5 px-3">Movement</th>
+                <th className="py-2.5 px-3 text-right">Qty</th>
+                <th className="py-2.5 px-3">Donor Impact</th>
+                <th className="py-2.5 px-3">Recipient Impact</th>
+                <th className="py-2.5 px-3">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {redistributionRows.map((row) => (
+                <tr key={row.id} className="border-b border-white/30 hover:bg-white/40 transition-colors">
+                  <td className="py-3 px-3">
+                    <p className="text-sm font-mono text-slate-900">{row.id}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{row.pickupPlan}</p>
+                  </td>
+                  <td className="py-3 px-3">
+                    <p className="text-sm font-semibold text-slate-900">{row.donor}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">to {row.recipient}</p>
+                  </td>
+                  <td className="py-3 px-3 text-right">
+                    <p className="text-sm font-mono text-slate-900">{formatNumber(row.transferQty)}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{row.mode === 'percent' ? `${row.inputQuantity}% donor` : 'Numbers'}</p>
+                  </td>
+                  <td className="py-3 px-3 text-sm font-mono text-slate-700">
+                    {formatNumber(row.donorBefore)}{' -> '}<span className="text-red-700">{formatNumber(row.donorAfter)}</span>
+                  </td>
+                  <td className="py-3 px-3 text-sm font-mono text-slate-700">
+                    {formatNumber(row.recipientBefore)}{' -> '}<span className="text-green-700">{formatNumber(row.recipientAfter)}</span>
+                  </td>
+                  <td className="py-3 px-3">
+                    <span className="px-2 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold border border-green-200">{row.status}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -1322,10 +1532,11 @@ export default function SemenDashboard({ screen = 'state', districts, onDistrict
 }
 
 export function CDVOSemenPortal({ districts = odishaDistricts }: { districts?: DistrictSemen[] }) {
-  const district = districts.find((item) => item.name === 'Khordha') ?? districts[0];
+  const [selectedDistrictName, setSelectedDistrictName] = useState('Khordha');
+  const [active, setActive] = useState<'dashboard' | 'allocation' | 'approval' | 'restocking' | 'reports'>('dashboard');
+  const district = districts.find((item) => item.name === selectedDistrictName) ?? districts[0];
   const blocks = makeBlocks(district);
   const lacs = makeLacs(district);
-  const [active, setActive] = useState<'dashboard' | 'allocation' | 'approval' | 'reports'>('dashboard');
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
@@ -1337,6 +1548,7 @@ export function CDVOSemenPortal({ districts = odishaDistricts }: { districts?: D
             ['dashboard', 'District Dashboard'],
             ['allocation', 'Block Allocation'],
             ['approval', 'Request Approval'],
+            ['restocking', 'Restocking Request'],
             ['reports', 'District Reports'],
           ].map(([key, label]) => (
             <button key={key} onClick={() => setActive(key as typeof active)} className={`px-3 py-2 rounded-xl text-sm ${active === key ? 'bg-green-600 text-white' : 'bg-white/70 text-slate-700'}`}>{label}</button>
@@ -1351,11 +1563,63 @@ export function CDVOSemenPortal({ districts = odishaDistricts }: { districts?: D
             <StatTile icon={<ShieldAlert size={20} className="text-red-700" />} label="Non-reporting blocks" value={String(blocks.filter((item) => !item.reporting).length)} detail="Flagged for follow-up" tone="#fee2e2" />
             <StatTile icon={<AlertTriangle size={20} className="text-amber-700" />} label="Pending block requests" value="5" detail="Awaiting CDVO action" tone="#fef3c7" />
           </div>
-          <DistrictDrilldown districts={[district]} selectedDistrictName={district.name} onSelectedDistrictChange={() => undefined} />
+          <DistrictDrilldown districts={districts} selectedDistrictName={selectedDistrictName} onSelectedDistrictChange={setSelectedDistrictName}/>
+          
+          {/* Recent Allocations Card */}
+          <div className="glass-card rounded-2xl p-6">
+            <SectionHeader eyebrow="ALLOCATION LOG" title="Recent Semen Dose Allocation" detail={`Last 7 days allocation history for ${district.name}`} />
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-white/20">
+                    <th className="text-left py-3 px-4 text-slate-600 font-semibold">Block</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-semibold">Semen Type</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-semibold">Animal</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-semibold">Quantity</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-semibold">Date & Time</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-semibold">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {allocationHistory.filter((item) => item.district === district.name).slice(0, 5).map((row) => (
+                    <tr key={row.id} className="border-b border-white/10 hover:bg-white/30 transition-colors">
+                      <td className="py-3 px-4 text-slate-900 font-medium">{row.block}</td>
+                      <td className="py-3 px-4">
+                        <span className={`text-xs px-2 py-1 rounded-lg font-medium ${row.semenType === 'Normal' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                          {row.semenType}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-slate-700">{row.animalType}</td>
+                      <td className="py-3 px-4 font-mono text-slate-900">{formatNumber(row.quantity)}</td>
+                      <td className="py-3 px-4 text-slate-700 text-xs">
+                        <div>{row.allocatedDate}</div>
+                        <div className="text-slate-500">{row.allocatedTime}</div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className={`text-xs px-2 py-1 rounded-lg font-medium ${
+                          row.status === 'Received' ? 'bg-green-100 text-green-700' :
+                          row.status === 'In Transit' ? 'bg-blue-100 text-blue-700' :
+                          row.status === 'Pending' ? 'bg-amber-100 text-amber-700' :
+                          'bg-slate-100 text-slate-700'
+                        }`}>
+                          {row.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="mt-4 flex gap-2">
+              <button className="px-4 py-2 rounded-xl bg-green-600 text-white text-sm font-medium hover:bg-green-700">View Full History</button>
+              <button className="px-4 py-2 rounded-xl border border-green-600 text-green-700 text-sm font-medium hover:bg-green-50">Export Report</button>
+            </div>
+          </div>
         </>
       )}
       {active === 'allocation' && <BlockAllocation blocks={blocks} />}
       {active === 'approval' && <BlockRequestApproval />}
+      {active === 'restocking' && <RestockingRequestForm district={district} />}
       {active === 'reports' && <ReportsScreen districts={[district, ...districts.slice(1, 8)]} />}
       <div className="glass-card rounded-2xl p-6">
         <SectionHeader eyebrow="LAC BREAKDOWN" title="LAC-wise Inventory Snapshot" detail="Quick district view for CDVO monitoring." />
@@ -1369,16 +1633,76 @@ export function CDVOSemenPortal({ districts = odishaDistricts }: { districts?: D
 
 function BlockAllocation({ blocks }: { blocks: ReturnType<typeof makeBlocks> }) {
   const [block, setBlock] = useState(blocks[0]?.name ?? '');
+  const [type, setType] = useState('Normal');
+  const [quantity, setQuantity] = useState(120);
+  const [pickupSlot, setPickupSlot] = useState('2026-05-25T11:00');
+  const [message, setMessage] = useState<string | null>(null);
+  const [rows, setRows] = useState<Array<{ id: string; block: string; type: string; quantity: number; pickupSlot: string; status: 'Allocated' | 'In Transit' | 'Delivered' }>>([
+    { id: 'ALLOC-001', block: 'Khordha Block 1', type: 'Normal', quantity: 120, pickupSlot: '2026-05-25 11:00', status: 'Allocated' },
+    { id: 'ALLOC-002', block: 'Khordha Block 3', type: 'Sex Sorted', quantity: 80, pickupSlot: '2026-05-24 15:30', status: 'In Transit' },
+    { id: 'ALLOC-003', block: 'Khordha Block 5', type: 'Normal', quantity: 140, pickupSlot: '2026-05-23 10:00', status: 'Delivered' },
+  ]);
+
+  const submitAllocation = () => {
+    const newRow = {
+      id: `ALLOC-${String(rows.length + 1).padStart(3, '0')}`,
+      block,
+      type,
+      quantity,
+      pickupSlot: pickupSlot.replace('T', ' '),
+      status: 'Allocated' as const,
+    };
+    setRows((current) => [newRow, ...current]);
+    setMessage(`${formatNumber(quantity)} doses allocated to ${block} and added to allocation history.`);
+  };
+
   return (
-    <div className="glass-card rounded-2xl p-6">
-      <SectionHeader eyebrow="" title="Block Allocation Screen" detail="Select block, type, quantity, pickup slot, and redistribute between blocks." />
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
-        <select value={block} onChange={(event) => setBlock(event.target.value)} className="px-4 py-2.5 rounded-xl bg-white/70 border border-white/30">{blocks.map((item) => <option key={item.name}>{item.name}</option>)}</select>
-        <select className="px-4 py-2.5 rounded-xl bg-white/70 border border-green/30"><option>Normal</option><option>Sex Sorted</option></select>
-        <input type="number" defaultValue={120} className="px-4 py-2.5 rounded-xl bg-white/70 border border-green/30" />
-        <input type="datetime-local" defaultValue="2026-05-25T11:00" className="px-4 py-2.5 rounded-xl bg-white/70 border border-green/30" />
+    <div className="glass-card rounded-2xl p-6 space-y-6">
+      <div>
+        <SectionHeader eyebrow="" title="Block Allocation Screen" detail="Select block, type, quantity, pickup slot, and redistribute between blocks." />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+          <select value={block} onChange={(event) => setBlock(event.target.value)} className="px-4 py-2.5 rounded-xl bg-white/70 border border-white/30 text-slate-900">{blocks.map((item) => <option key={item.name}>{item.name}</option>)}</select>
+          <select value={type} onChange={(event) => setType(event.target.value)} className="px-4 py-2.5 rounded-xl bg-white/70 border border-green/30 text-slate-900"><option>Normal</option><option>Sex Sorted</option></select>
+          <input type="number" value={quantity} min={1} onChange={(event) => setQuantity(Number(event.target.value))} className="px-4 py-2.5 rounded-xl bg-white/70 border border-green/30 text-slate-900" />
+          <input type="datetime-local" value={pickupSlot} onChange={(event) => setPickupSlot(event.target.value)} className="px-4 py-2.5 rounded-xl bg-white/70 border border-green/30 text-slate-900" />
+        </div>
+        <button onClick={submitAllocation} className="mt-5 px-8 py-3 rounded-xl bg-green-600 text-white hover:bg-green-700 transition-all">Submit Block Allocation</button>
+        {message && <div className="mt-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{message}</div>}
       </div>
-      <button className="mt-5 px-8 py-3 rounded-xl bg-green-600 text-white">Submit Block Allocation</button>
+
+      <div className="glass-card rounded-2xl p-6 bg-white/80 border border-white/40">
+        <SectionHeader eyebrow="ALLOCATION HISTORY" title="Allocated Blocks" detail="Recent block allocations for this district." />
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm text-left">
+            <thead>
+              <tr className="border-b border-slate-200 text-slate-600">
+                <th className="py-3 px-4 font-semibold">Allocation ID</th>
+                <th className="py-3 px-4 font-semibold">Block</th>
+                <th className="py-3 px-4 font-semibold">Type</th>
+                <th className="py-3 px-4 font-semibold">Quantity</th>
+                <th className="py-3 px-4 font-semibold">Pickup Slot</th>
+                <th className="py-3 px-4 font-semibold">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <td className="py-3 px-4 font-mono text-slate-900">{row.id}</td>
+                  <td className="py-3 px-4 text-slate-900">{row.block}</td>
+                  <td className="py-3 px-4 text-slate-700">{row.type}</td>
+                  <td className="py-3 px-4 font-mono text-slate-900">{formatNumber(row.quantity)}</td>
+                  <td className="py-3 px-4 text-slate-700">{row.pickupSlot}</td>
+                  <td className="py-3 px-4">
+                    <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${row.status === 'Delivered' ? 'bg-green-100 text-green-700' : row.status === 'In Transit' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}`}>
+                      {row.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
@@ -1468,6 +1792,200 @@ function BlockRequestApproval() {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function RestockingRequestForm({ district }: { district: DistrictSemen }) {
+  const [requests, setRequests] = useState<Array<{ id: string; block: string; semenType: string; animalType: string; quantity: number; urgency: 'low' | 'medium' | 'high' | 'critical'; justification: string; submittedDate: string; status: 'Draft' | 'Submitted' | 'Approved' | 'Rejected' }>>([
+    { id: 'RESTOCK-001', block: 'Block 1', semenType: 'Normal', animalType: 'Cattle', quantity: 300, urgency: 'high', justification: 'Stock depleting faster than anticipated', submittedDate: '2026-05-24', status: 'Submitted' },
+    { id: 'RESTOCK-002', block: 'Block 3', semenType: 'Sex Sorted', animalType: 'Cattle', quantity: 150, urgency: 'medium', justification: 'Seasonal demand increase', submittedDate: '2026-05-23', status: 'Approved' },
+  ]);
+  const [formData, setFormData] = useState({ block: 'Block 1', semenType: 'Normal', animalType: 'Cattle', quantity: 200, urgency: 'medium', justification: '' });
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newRequest = {
+      id: `RESTOCK-${String(requests.length + 1).padStart(3, '0')}`,
+      ...formData,
+      submittedDate: new Date().toISOString().split('T')[0],
+      status: 'Draft' as const,
+    };
+    setRequests([newRequest, ...requests]);
+    setMessage({ type: 'success', text: `Restocking request submitted to Directorate. Request ID: ${newRequest.id}` });
+    setFormData({ block: 'Block 1', semenType: 'Normal', animalType: 'Cattle', quantity: 200, urgency: 'medium', justification: '' });
+  };
+
+  const urgencyColors: Record<string, string> = {
+    critical: 'bg-red-100 text-red-700 border-red-200',
+    high: 'bg-orange-100 text-orange-700 border-orange-200',
+    medium: 'bg-amber-100 text-amber-700 border-amber-200',
+    low: 'bg-blue-100 text-blue-700 border-blue-200',
+  };
+
+  const statusColors: Record<string, string> = {
+    Draft: 'bg-slate-100 text-slate-700 border-slate-200',
+    Submitted: 'bg-blue-100 text-blue-700 border-blue-200',
+    Approved: 'bg-green-100 text-green-700 border-green-200',
+    Rejected: 'bg-red-100 text-red-700 border-red-200',
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="glass-card rounded-2xl p-6">
+        <SectionHeader eyebrow="" title="Raise Restocking Request" detail="Submit semen restocking requests to Directorate for review and approval." />
+        
+        <form onSubmit={handleSubmit} className="space-y-4 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-900 mb-2">Block</label>
+              <select
+                value={formData.block}
+                onChange={(e) => setFormData({ ...formData, block: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                {Array.from({ length: Math.min(district.blocks, 10) }, (_, i) => `Block ${i + 1}`).map((block) => (
+                  <option key={block}>{block}</option>
+                ))}
+              </select>
+              <p className="text-xs text-slate-600 mt-1">Select the block requiring stock</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-900 mb-2">Semen Type</label>
+              <select
+                value={formData.semenType}
+                onChange={(e) => setFormData({ ...formData, semenType: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option>Normal</option>
+                <option>Sex Sorted</option>
+              </select>
+              <p className="text-xs text-slate-600 mt-1">Type of semen doses needed</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-900 mb-2">Animal Type</label>
+              <select
+                value={formData.animalType}
+                onChange={(e) => setFormData({ ...formData, animalType: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option>Cattle</option>
+                <option>Buffalo</option>
+                <option>Mixed</option>
+              </select>
+              <p className="text-xs text-slate-600 mt-1">Breed type</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-900 mb-2">Quantity (doses)</label>
+              <input
+                type="number"
+                min="1"
+                value={formData.quantity}
+                onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
+                className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <p className="text-xs text-slate-600 mt-1">Number of semen doses required</p>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-slate-900 mb-2">Urgency Level</label>
+              <select
+                value={formData.urgency}
+                onChange={(e) => setFormData({ ...formData, urgency: e.target.value as 'low' | 'medium' | 'high' | 'critical' })}
+                className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="low">Low - Routine replenishment</option>
+                <option value="medium">Medium - Moderate demand</option>
+                <option value="high">High - Urgent requirement</option>
+                <option value="critical">Critical - Immediate need</option>
+              </select>
+              <p className="text-xs text-slate-600 mt-1">Priority level for approval</p>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-slate-900 mb-2">Justification</label>
+              <textarea
+                value={formData.justification}
+                onChange={(e) => setFormData({ ...formData, justification: e.target.value })}
+                placeholder="Explain why this restocking is needed (e.g., seasonal demand, higher AI activity, stock depleting faster than expected)"
+                rows={4}
+                className="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <p className="text-xs text-slate-600 mt-1">Provide context for the request</p>
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="submit"
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-green-700 text-white font-medium hover:shadow-lg transition-all flex items-center gap-2"
+            >
+              <Send size={18} />
+              Submit Request to Directorate
+            </button>
+            <button
+              type="button"
+              onClick={() => setFormData({ block: 'Block 1', semenType: 'Normal', animalType: 'Cattle', quantity: 200, urgency: 'medium', justification: '' })}
+              className="px-6 py-3 rounded-xl border border-slate-300 text-slate-700 font-medium hover:bg-slate-50"
+            >
+              Reset
+            </button>
+          </div>
+
+          {message && (
+            <div className={`p-4 rounded-xl flex items-start gap-3 ${message.type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+              {message.type === 'success' ? <CheckCircle2 size={20} className="text-green-700 flex-shrink-0 mt-0.5" /> : <AlertTriangle size={20} className="text-red-700 flex-shrink-0 mt-0.5" />}
+              <p className={`text-sm ${message.type === 'success' ? 'text-green-800' : 'text-red-800'}`}>{message.text}</p>
+            </div>
+          )}
+        </form>
+      </div>
+
+      <div className="glass-card rounded-2xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <SectionHeader eyebrow="" title="Restocking Request History" detail={`All requests from ${district.name} district`} />
+          <span className="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold border border-green-200">{requests.length} requests</span>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-200">
+                <th className="text-left py-3 px-4 font-semibold text-slate-600">Request ID</th>
+                <th className="text-left py-3 px-4 font-semibold text-slate-600">Block</th>
+                <th className="text-left py-3 px-4 font-semibold text-slate-600">Type & Quantity</th>
+                <th className="text-left py-3 px-4 font-semibold text-slate-600">Urgency</th>
+                <th className="text-left py-3 px-4 font-semibold text-slate-600">Submitted</th>
+                <th className="text-left py-3 px-4 font-semibold text-slate-600">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {requests.map((req) => (
+                <tr key={req.id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <td className="py-3 px-4 font-mono text-slate-900">{req.id}</td>
+                  <td className="py-3 px-4 text-slate-900">{req.block}</td>
+                  <td className="py-3 px-4 text-slate-700">{req.semenType} - {req.animalType} ({formatNumber(req.quantity)} doses)</td>
+                  <td className="py-3 px-4">
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold border ${urgencyColors[req.urgency]}`}>
+                      {req.urgency.charAt(0).toUpperCase() + req.urgency.slice(1)}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-slate-600">{req.submittedDate}</td>
+                  <td className="py-3 px-4">
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold border ${statusColors[req.status]}`}>
+                      {req.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
