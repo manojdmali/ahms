@@ -25,8 +25,7 @@ export function EnhancedDashboard({ onNavigate }: EnhancedDashboardProps) {
       className="space-y-6"
     >
       {/* Welcome Section with Enhanced Design */}
-      <div className="glass-card-darker rounded-2xl p-6 sm:p-8 relative overflow-hidden">
-        {/* Decorative Background */}
+      {/* <div className="glass-card-darker rounded-2xl p-6 sm:p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-green-400/20 to-amber-400/20 rounded-full blur-3xl -z-10" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-blue-400/20 to-purple-400/20 rounded-full blur-3xl -z-10" />
         
@@ -52,7 +51,7 @@ export function EnhancedDashboard({ onNavigate }: EnhancedDashboardProps) {
             </div>
           </div>
 
-          {/* Key Highlights Bar */}
+        
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
             <div className="p-3 bg-white/50 rounded-xl border border-white/30">
               <p className="text-xs text-slate-600 mb-1">{t('District Rank', 'जिला रैंक', 'ଜିଲ୍ଲା ର୍ୟାଙ୍କ')}</p>
@@ -72,7 +71,7 @@ export function EnhancedDashboard({ onNavigate }: EnhancedDashboardProps) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Quick Stats Row with Enhanced Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
@@ -160,13 +159,16 @@ export function EnhancedDashboard({ onNavigate }: EnhancedDashboardProps) {
           />
         </motion.div>
       </div>
-
+      {/* Interactive Map Section */}
+      <div className="glass-card rounded-2xl p-6" style={{ height: '100vh' }}>
+        <OdishaMapDashboard />
+      </div>
       {/* Performance Metrics */}
       <div className="glass-card rounded-2xl p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-slate-800 mb-1">{t('Monthly Performance', 'मासिक प्रदर्शन', 'ମାସିକ ପ୍ରଦର୍ଶନ')}</h3>
-            <p className="text-sm text-slate-600">{t('November 2024', 'नवंबर 2024', 'ନଭେମ୍ବର ୨୦୨୪')}</p>
+            <p className="text-sm text-slate-600">{t('November 2026', 'नवंबर 2026', 'ନଭେମ୍ବର ୨୦୨୬')}</p>
           </div>
           <button className="px-4 py-2 rounded-xl bg-white/70 border border-white/30 hover:bg-white transition-all text-sm">
             {t('View Details', 'विवरण देखें', 'ବିସ୍ତୃତ ଦେଖନ୍ତୁ')}
@@ -313,10 +315,7 @@ export function EnhancedDashboard({ onNavigate }: EnhancedDashboardProps) {
         </div>
       </div>
 
-      {/* Interactive Map Section */}
-      <div className="glass-card rounded-2xl p-6" style={{ height: '100vh' }}>
-        <OdishaMapDashboard />
-      </div>
+      
 
       {/* Footer */}
       <div className="glass-card rounded-2xl p-6">

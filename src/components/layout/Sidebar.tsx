@@ -58,6 +58,7 @@ export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNa
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const allowedPaths = user ? ROLE_MENU_ACCESS[user.role] : [];
+  const navigableParentPaths = ['semen-dashboard', 'cdvo-semen', 'lac-medicine-home', 'mvu-command','bvo-mvu-inventory','mvu-team-home'];
 
   useEffect(() => {
     setActiveItem(currentPage);
@@ -95,7 +96,7 @@ export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNa
       labelOd: 'CDVO Semen',
       path: 'cdvo-semen',
       children: [
-        { icon: <Home size={20} />, labelEn: 'District Dashboard', labelHi: 'District Dashboard', labelOd: 'District Dashboard', path: 'cdvo-semen-dashboard' },
+        // { icon: <Home size={20} />, labelEn: 'District Dashboard', labelHi: 'District Dashboard', labelOd: 'District Dashboard', path: 'cdvo-semen-dashboard' },
         { icon: <Syringe size={20} />, labelEn: 'Block Allocation', labelHi: 'Block Allocation', labelOd: 'Block Allocation', path: 'cdvo-semen-allocation' },
         { icon: <ClipboardList size={20} />, labelEn: 'Request Approval', labelHi: 'Request Approval', labelOd: 'Request Approval', path: 'cdvo-semen-approval' },
         { icon: <Package size={20} />, labelEn: 'Restocking Request', labelHi: 'Restocking Request', labelOd: 'Restocking Request', path: 'cdvo-semen-restocking' },
@@ -137,7 +138,7 @@ export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNa
       ],
     },
     { icon: <Truck size={20} />, labelEn: 'CDVO MVU', labelHi: 'CDVO MVU', labelOd: 'CDVO MVU', path: 'cdvo-mvu' },
-    { icon: <Route size={20} />, labelEn: 'BVO Tour Plan', labelHi: 'BVO Tour Plan', labelOd: 'BVO Tour Plan', path: 'bvo-mvu-plan' },
+
     {
       icon: <Package size={20} />,
       labelEn: 'BVO MVU Inventory',
@@ -145,7 +146,8 @@ export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNa
       labelOd: 'BVO MVU Inventory',
       path: 'bvo-mvu-inventory',
       children: [
-        { icon: <Package size={20} />, labelEn: 'Medicine Inventory', labelHi: 'Medicine Inventory', labelOd: 'Medicine Inventory', path: 'bvo-mvu-inventory' },
+        { icon: <Route size={20} />, labelEn: 'BVO Tour Plan', labelHi: 'BVO Tour Plan', labelOd: 'BVO Tour Plan', path: 'bvo-mvu-plan' },
+        { icon: <Package size={20} />, labelEn: 'Medicine Inventory', labelHi: 'Medicine Inventory', labelOd: 'Medicine Inventory', path: 'lac-medicine-inventory' },
         { icon: <ClipboardList size={20} />, labelEn: 'Assignments', labelHi: 'Assignments', labelOd: 'Assignments', path: 'bvo-mvu-assignment' },
       ],
     },
@@ -178,10 +180,9 @@ export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNa
   useEffect(() => {
     const activeParent = navItems.find((item) => {
       const visibleChildren = item.children?.filter((child) => allowedPaths.includes(child.path)) ?? [];
-      return visibleChildren.length > 0 && (
-        item.path === currentPage ||
-        visibleChildren.some((child) => child.path === currentPage)
-      );
+      const isChildActive = visibleChildren.some((child) => child.path === currentPage);
+      const shouldExpandActiveParent = item.path === currentPage && !navigableParentPaths.includes(item.path);
+      return visibleChildren.length > 0 && (shouldExpandActiveParent || isChildActive);
     });
     if (activeParent) {
       setExpandedSubmenus((prev) => (prev.includes(activeParent.path) ? prev : [...prev, activeParent.path]));
@@ -254,6 +255,13 @@ export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNa
               <button
                 onClick={() => {
                   if (hasVisibleChildren) {
+                    if (navigableParentPaths.includes(item.path)) {
+                      handleNavClick(item.path);
+                      if (!isCollapsed) {
+                        toggleSubmenu(item.path);
+                      }
+                      return;
+                    }
                     if (isCollapsed) {
                       handleNavClick(filteredChildren[0].path);
                       return;
