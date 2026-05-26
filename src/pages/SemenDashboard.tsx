@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import {
@@ -1531,12 +1531,39 @@ export default function SemenDashboard({ screen = 'state', districts, onDistrict
   );
 }
 
-export function CDVOSemenPortal({ districts = odishaDistricts }: { districts?: DistrictSemen[] }) {
+type CDVOSemenPortalScreen = 'dashboard' | 'allocation' | 'approval' | 'restocking' | 'reports';
+
+const cdvoSemenScreenPages: Record<CDVOSemenPortalScreen, string> = {
+  dashboard: 'cdvo-semen-dashboard',
+  allocation: 'cdvo-semen-allocation',
+  approval: 'cdvo-semen-approval',
+  restocking: 'cdvo-semen-restocking',
+  reports: 'cdvo-semen-reports',
+};
+
+export function CDVOSemenPortal({
+  districts = odishaDistricts,
+  screen = 'dashboard',
+  onNavigate,
+}: {
+  districts?: DistrictSemen[];
+  screen?: CDVOSemenPortalScreen;
+  onNavigate?: (page: string) => void;
+}) {
   const [selectedDistrictName, setSelectedDistrictName] = useState('Khordha');
-  const [active, setActive] = useState<'dashboard' | 'allocation' | 'approval' | 'restocking' | 'reports'>('dashboard');
+  const [active, setActive] = useState<CDVOSemenPortalScreen>(screen);
   const district = districts.find((item) => item.name === selectedDistrictName) ?? districts[0];
   const blocks = makeBlocks(district);
   const lacs = makeLacs(district);
+
+  useEffect(() => {
+    setActive(screen);
+  }, [screen]);
+
+  const handleCdvoTabClick = (nextScreen: CDVOSemenPortalScreen) => {
+    setActive(nextScreen);
+    onNavigate?.(cdvoSemenScreenPages[nextScreen]);
+  };
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
@@ -1551,7 +1578,7 @@ export function CDVOSemenPortal({ districts = odishaDistricts }: { districts?: D
             ['restocking', 'Restocking Request'],
             ['reports', 'District Reports'],
           ].map(([key, label]) => (
-            <button key={key} onClick={() => setActive(key as typeof active)} className={`px-3 py-2 rounded-xl text-sm ${active === key ? 'bg-green-600 text-white' : 'bg-white/70 text-slate-700'}`}>{label}</button>
+            <button key={key} onClick={() => handleCdvoTabClick(key as CDVOSemenPortalScreen)} className={`px-3 py-2 rounded-xl text-sm ${active === key ? 'bg-green-600 text-white' : 'bg-white/70 text-slate-700'}`}>{label}</button>
           ))}
         </div>
       </div>

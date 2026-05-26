@@ -26,7 +26,7 @@ import { DistrictSemen, odishaDistricts } from './data/semenData';
 import { initialMedicineRequisitions, MedicineRequisition, MedicineStockItem, medicineStock } from './data/medicineMvuData';
 import ahmsAiMockData from './data/ahmsAiMockData.json';
 
-type Page = 'dashboard' | 'semen-dashboard' | 'semen-drilldown' | 'semen-allocation' | 'semen-redistribution' | 'semen-requests' | 'semen-reports' | 'semen-forecasting' | 'cdvo-semen' | 'sdvo-semen' | 'lac-medicine-home' | 'lac-medicine-log' | 'lac-medicine-farmer' | 'lac-medicine-barcode' | 'lac-medicine-request' | 'lac-medicine-inventory' | 'lac-medicine-offline' | 'farmer-medicine-login' | 'farmer-medicine-request' | 'farmer-medicine-history' | 'farmer-medicine-chatbot' | 'bvo-medicine-queue' | 'mvu-command' | 'mvu-compliance' | 'mvu-fleet' | 'mvu-manpower' | 'mvu-targets' | 'cdvo-mvu' | 'bvo-mvu-plan' | 'bvo-mvu-inventory' | 'bvo-mvu-assignment' | 'mvu-team-home' | 'mvu-team-visit' | 'mvu-team-daily' | 'mvu-team-stock' | 'livestock' | 'health' | 'breeding' | 'farmers' | 'dairy' | 'schemes' | 'insurance' | 'market' | 'training' | 'reports' | 'settings';
+type Page = 'dashboard' | 'semen-dashboard' | 'semen-drilldown' | 'semen-allocation' | 'semen-redistribution' | 'semen-requests' | 'semen-reports' | 'semen-forecasting' | 'cdvo-semen' | 'cdvo-semen-dashboard' | 'cdvo-semen-allocation' | 'cdvo-semen-approval' | 'cdvo-semen-restocking' | 'cdvo-semen-reports' | 'sdvo-semen' | 'lac-medicine-home' | 'lac-medicine-log' | 'lac-medicine-farmer' | 'lac-medicine-barcode' | 'lac-medicine-request' | 'lac-medicine-inventory' | 'lac-medicine-offline' | 'farmer-medicine-login' | 'farmer-medicine-request' | 'farmer-medicine-history' | 'farmer-medicine-chatbot' | 'bvo-medicine-queue' | 'mvu-command' | 'mvu-compliance' | 'mvu-fleet' | 'mvu-manpower' | 'mvu-targets' | 'cdvo-mvu' | 'bvo-mvu-plan' | 'bvo-mvu-inventory' | 'bvo-mvu-assignment' | 'mvu-team-home' | 'mvu-team-visit' | 'mvu-team-daily' | 'mvu-team-stock' | 'livestock' | 'health' | 'breeding' | 'farmers' | 'dairy' | 'schemes' | 'insurance' | 'market' | 'training' | 'reports' | 'settings';
 
 const pageRoutes: Record<string, Page> = {
   '/semen/dashboard': 'semen-dashboard',
@@ -37,7 +37,12 @@ const pageRoutes: Record<string, Page> = {
   '/ahms/semen/requests': 'semen-requests',
   '/ahms/semen/reports': 'semen-reports',
   '/ahms/semen/forecasting': 'semen-forecasting',
-  '/ahms/cdvo/semen': 'cdvo-semen',
+  '/ahms/cdvo/semen': 'cdvo-semen-dashboard',
+  '/ahms/cdvo/semen/dashboard': 'cdvo-semen-dashboard',
+  '/ahms/cdvo/semen/allocation': 'cdvo-semen-allocation',
+  '/ahms/cdvo/semen/approval': 'cdvo-semen-approval',
+  '/ahms/cdvo/semen/restocking': 'cdvo-semen-restocking',
+  '/ahms/cdvo/semen/reports': 'cdvo-semen-reports',
   '/ahms/sdvo/semen': 'sdvo-semen',
   '/ahms/lac/medicine': 'lac-medicine-home',
   '/ahms/lac/medicine/log': 'lac-medicine-log',
@@ -77,6 +82,11 @@ const routePaths: Partial<Record<Page, string>> = {
   'semen-reports': '/ahms/semen/reports',
   'semen-forecasting': '/ahms/semen/forecasting',
   'cdvo-semen': '/ahms/cdvo/semen',
+  'cdvo-semen-dashboard': '/ahms/cdvo/semen',
+  'cdvo-semen-allocation': '/ahms/cdvo/semen/allocation',
+  'cdvo-semen-approval': '/ahms/cdvo/semen/approval',
+  'cdvo-semen-restocking': '/ahms/cdvo/semen/restocking',
+  'cdvo-semen-reports': '/ahms/cdvo/semen/reports',
   'sdvo-semen': '/ahms/sdvo/semen',
   'lac-medicine-home': '/ahms/lac/medicine',
   'lac-medicine-log': '/ahms/lac/medicine/log',
@@ -450,12 +460,7 @@ function AhmsAiChatbot({
 function AppShell() {
   const { user } = useAuth();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  // Prioritise a farmer's, superadmin's, or BVO's configured homePath so they always
-  // land on their default first-visible menu after login, instead of
-  // inheriting the previous route from the URL.
-  const initialPage = user && (user.role === 'farmer' || user.role === 'superadmin' || user.role === 'bvo')
-    ? (user.homePath as Page)
-    : getInitialPage(user?.homePath ?? 'dashboard');
+  const initialPage = user?.homePath ? (user.homePath as Page) : getInitialPage('dashboard');
   const [currentPage, setCurrentPage] = useState<Page>(initialPage);
   const [semenDistricts, setSemenDistricts] = useState<DistrictSemen[]>(odishaDistricts);
   const [medicineInventory, setMedicineInventory] = useState<MedicineStockItem[]>(medicineStock);
@@ -473,21 +478,10 @@ function AppShell() {
   };
 
   useEffect(() => {
-    if (user) {
-      // For farmer (end-user) logins we want to always open their default
-      // home menu rather than preserving the previous route left in the URL.
-      // For other roles, preserve behavior and only navigate when there's
-      // no explicit route in the address bar.
-      const routedPage = pageRoutes[window.location.pathname];
-      if (user.role === 'farmer' || user.role === 'superadmin' || user.role === 'bvo') {
-        if (user.homePath) navigateToPage(user.homePath as Page);
-      } else {
-        if (!routedPage && user.homePath) {
-          navigateToPage(user.homePath as Page);
-        }
-      }
+    if (user?.homePath) {
+      navigateToPage(user.homePath as Page);
     }
-  }, [user]);
+  }, [user?.id]);
 
   if (!user) return <LoginPage />;
 
@@ -537,7 +531,12 @@ function AppShell() {
     }
 
     switch (currentPage) {
-      case 'cdvo-semen': return <CDVOSemenPortal districts={semenDistricts} />;
+      case 'cdvo-semen':
+      case 'cdvo-semen-dashboard': return <CDVOSemenPortal districts={semenDistricts} screen="dashboard" onNavigate={(page) => navigateToPage(page as Page)} />;
+      case 'cdvo-semen-allocation': return <CDVOSemenPortal districts={semenDistricts} screen="allocation" onNavigate={(page) => navigateToPage(page as Page)} />;
+      case 'cdvo-semen-approval': return <CDVOSemenPortal districts={semenDistricts} screen="approval" onNavigate={(page) => navigateToPage(page as Page)} />;
+      case 'cdvo-semen-restocking': return <CDVOSemenPortal districts={semenDistricts} screen="restocking" onNavigate={(page) => navigateToPage(page as Page)} />;
+      case 'cdvo-semen-reports': return <CDVOSemenPortal districts={semenDistricts} screen="reports" onNavigate={(page) => navigateToPage(page as Page)} />;
       case 'sdvo-semen': return <SDVOSemenPortal districts={semenDistricts} />;
       case 'bvo-medicine-queue': return <BVOMedicineQueue requisitions={medicineRequests} />;
       case 'cdvo-mvu': return <CDVOMVUOperations />;

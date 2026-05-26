@@ -15,6 +15,7 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
   Map,
   AlertTriangle,
   ArrowRightLeft,
@@ -41,6 +42,7 @@ interface NavItem {
   labelOd: string;
   path: string;
   active?: boolean;
+  children?: NavItem[];
 }
 
 interface SidebarProps {
@@ -52,6 +54,7 @@ interface SidebarProps {
 
 export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNavigate }: SidebarProps) {
   const [activeItem, setActiveItem] = useState(currentPage);
+  const [expandedSubmenus, setExpandedSubmenus] = useState<string[]>([]);
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const allowedPaths = user ? ROLE_MENU_ACCESS[user.role] : [];
@@ -59,43 +62,105 @@ export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNa
   useEffect(() => {
     setActiveItem(currentPage);
   }, [currentPage]);
+
+  const toggleSubmenu = (path: string) => {
+    setExpandedSubmenus(prev =>
+      prev.includes(path)
+        ? prev.filter(p => p !== path)
+        : [...prev, path]
+    );
+  };
   
   const navItems: NavItem[] = [
     { icon: <Home size={20} />, labelEn: 'Dashboard', labelHi: 'डैशबोर्ड', labelOd: 'ଡ୍ୟାସବୋର୍ଡ', path: 'dashboard', active: true },
-    { icon: <Map size={20} />, labelEn: 'Semen Dashboard', labelHi: 'Semen Dashboard', labelOd: 'Semen Dashboard', path: 'semen-dashboard' },
-    { icon: <Warehouse size={20} />, labelEn: 'District Drilldown', labelHi: 'District Drilldown', labelOd: 'District Drilldown', path: 'semen-drilldown' },
-    { icon: <Syringe size={20} />, labelEn: 'District-wise allocation', labelHi: 'District-wise allocation', labelOd: 'District-wise allocation', path: 'semen-allocation' },
-    { icon: <ArrowRightLeft size={20} />, labelEn: 'Stock Redistribution', labelHi: 'Stock Redistribution', labelOd: 'Stock Redistribution', path: 'semen-redistribution' },
-    { icon: <ClipboardList size={20} />, labelEn: 'Restocking Requests', labelHi: 'Restocking Requests', labelOd: 'Restocking Requests', path: 'semen-requests' },
-    { icon: <BarChart3 size={20} />, labelEn: 'Semen Reports', labelHi: 'Semen Reports', labelOd: 'Semen Reports', path: 'semen-reports' },
+    {
+      icon: <Map size={20} />,
+      labelEn: 'Semen Dashboard',
+      labelHi: 'Semen Dashboard',
+      labelOd: 'Semen Dashboard',
+      path: 'semen-dashboard',
+      children: [
+        { icon: <Warehouse size={20} />, labelEn: 'District Drilldown', labelHi: 'District Drilldown', labelOd: 'District Drilldown', path: 'semen-drilldown' },
+        { icon: <Syringe size={20} />, labelEn: 'District-wise allocation', labelHi: 'District-wise allocation', labelOd: 'District-wise allocation', path: 'semen-allocation' },
+        { icon: <ArrowRightLeft size={20} />, labelEn: 'Stock Redistribution', labelHi: 'Stock Redistribution', labelOd: 'Stock Redistribution', path: 'semen-redistribution' },
+        { icon: <ClipboardList size={20} />, labelEn: 'Restocking Requests', labelHi: 'Restocking Requests', labelOd: 'Restocking Requests', path: 'semen-requests' },
+        { icon: <BarChart3 size={20} />, labelEn: 'Semen Reports', labelHi: 'Semen Reports', labelOd: 'Semen Reports', path: 'semen-reports' },
+      ]
+    },
     { icon: <Sparkles size={20} />, labelEn: 'AI Forecasting', labelHi: 'AI Forecasting', labelOd: 'AI Forecasting', path: 'semen-forecasting' },
-    { icon: <FlaskConical size={20} />, labelEn: 'CDVO Semen', labelHi: 'CDVO Semen', labelOd: 'CDVO Semen', path: 'cdvo-semen' },
+    {
+      icon: <FlaskConical size={20} />,
+      labelEn: 'CDVO Semen',
+      labelHi: 'CDVO Semen',
+      labelOd: 'CDVO Semen',
+      path: 'cdvo-semen',
+      children: [
+        { icon: <Home size={20} />, labelEn: 'District Dashboard', labelHi: 'District Dashboard', labelOd: 'District Dashboard', path: 'cdvo-semen-dashboard' },
+        { icon: <Syringe size={20} />, labelEn: 'Block Allocation', labelHi: 'Block Allocation', labelOd: 'Block Allocation', path: 'cdvo-semen-allocation' },
+        { icon: <ClipboardList size={20} />, labelEn: 'Request Approval', labelHi: 'Request Approval', labelOd: 'Request Approval', path: 'cdvo-semen-approval' },
+        { icon: <Package size={20} />, labelEn: 'Restocking Request', labelHi: 'Restocking Request', labelOd: 'Restocking Request', path: 'cdvo-semen-restocking' },
+        { icon: <BarChart3 size={20} />, labelEn: 'District Reports', labelHi: 'District Reports', labelOd: 'District Reports', path: 'cdvo-semen-reports' },
+      ],
+    },
     { icon: <FlaskConical size={20} />, labelEn: 'SDVO Semen', labelHi: 'SDVO Semen', labelOd: 'SDVO Semen', path: 'sdvo-semen' },
-    { icon: <Package size={20} />, labelEn: 'LAC Medicine Home', labelHi: 'LAC Medicine Home', labelOd: 'LAC Medicine Home', path: 'lac-medicine-home' },
-    { icon: <Syringe size={20} />, labelEn: 'Log Medicine', labelHi: 'Log Medicine', labelOd: 'Log Medicine', path: 'lac-medicine-log' },
-    { icon: <Users size={20} />, labelEn: 'Farmer Profile', labelHi: 'Farmer Profile', labelOd: 'Farmer Profile', path: 'lac-medicine-farmer' },
-    { icon: <Barcode size={20} />, labelEn: 'Barcode Receipt', labelHi: 'Barcode Receipt', labelOd: 'Barcode Receipt', path: 'lac-medicine-barcode' },
-    { icon: <ClipboardList size={20} />, labelEn: 'Medicine Request', labelHi: 'Medicine Request', labelOd: 'Medicine Request', path: 'lac-medicine-request' },
-    { icon: <Warehouse size={20} />, labelEn: 'Medicine Inventory', labelHi: 'Medicine Inventory', labelOd: 'Medicine Inventory', path: 'lac-medicine-inventory' },
-    { icon: <CloudOff size={20} />, labelEn: 'Offline Mode', labelHi: 'Offline Mode', labelOd: 'Offline Mode', path: 'lac-medicine-offline' },
+    {
+      icon: <Package size={20} />,
+      labelEn: 'LAC Medicine Home',
+      labelHi: 'LAC Medicine Home',
+      labelOd: 'LAC Medicine Home',
+      path: 'lac-medicine-home',
+      children: [
+        { icon: <Syringe size={20} />, labelEn: 'Log Medicine', labelHi: 'Log Medicine', labelOd: 'Log Medicine', path: 'lac-medicine-log' },
+        { icon: <Users size={20} />, labelEn: 'Farmer Profile', labelHi: 'Farmer Profile', labelOd: 'Farmer Profile', path: 'lac-medicine-farmer' },
+        { icon: <Barcode size={20} />, labelEn: 'Barcode Receipt', labelHi: 'Barcode Receipt', labelOd: 'Barcode Receipt', path: 'lac-medicine-barcode' },
+        { icon: <ClipboardList size={20} />, labelEn: 'Raise Request', labelHi: 'Raise Request', labelOd: 'Raise Request', path: 'lac-medicine-request' },
+        { icon: <Warehouse size={20} />, labelEn: 'Inventory', labelHi: 'Inventory', labelOd: 'Inventory', path: 'lac-medicine-inventory' },
+        { icon: <CloudOff size={20} />, labelEn: 'Offline Mode', labelHi: 'Offline Mode', labelOd: 'Offline Mode', path: 'lac-medicine-offline' },
+      ],
+    },
     { icon: <Package size={20} />, labelEn: 'Farmer Medicine Login', labelHi: 'Farmer Medicine Login', labelOd: 'Farmer Medicine Login', path: 'farmer-medicine-login' },
     { icon: <Syringe size={20} />, labelEn: 'Medicine Service', labelHi: 'Medicine Service', labelOd: 'Medicine Service', path: 'farmer-medicine-request' },
     { icon: <ClipboardList size={20} />, labelEn: 'Medicine History', labelHi: 'Medicine History', labelOd: 'Medicine History', path: 'farmer-medicine-history' },
     { icon: <Bot size={20} />, labelEn: 'Medicine Chatbot', labelHi: 'Medicine Chatbot', labelOd: 'Medicine Chatbot', path: 'farmer-medicine-chatbot' },
     { icon: <AlertTriangle size={20} />, labelEn: 'BVO Medicine Queue', labelHi: 'BVO Medicine Queue', labelOd: 'BVO Medicine Queue', path: 'bvo-medicine-queue' },
-    { icon: <Truck size={20} />, labelEn: 'MVU Command', labelHi: 'MVU Command', labelOd: 'MVU Command', path: 'mvu-command' },
-    { icon: <ClipboardList size={20} />, labelEn: 'MVU Compliance', labelHi: 'MVU Compliance', labelOd: 'MVU Compliance', path: 'mvu-compliance' },
-    { icon: <Route size={20} />, labelEn: 'MVU Fleet Tracking', labelHi: 'MVU Fleet Tracking', labelOd: 'MVU Fleet Tracking', path: 'mvu-fleet' },
-    { icon: <Users size={20} />, labelEn: 'MVU Manpower', labelHi: 'MVU Manpower', labelOd: 'MVU Manpower', path: 'mvu-manpower' },
-    { icon: <BarChart3 size={20} />, labelEn: 'MVU Targets', labelHi: 'MVU Targets', labelOd: 'MVU Targets', path: 'mvu-targets' },
+    {
+      icon: <Truck size={20} />,
+      labelEn: 'MVU Command',
+      labelHi: 'MVU Command',
+      labelOd: 'MVU Command',
+      path: 'mvu-command',
+      children: [
+        { icon: <ClipboardList size={20} />, labelEn: 'Compliance Report', labelHi: 'Compliance Report', labelOd: 'Compliance Report', path: 'mvu-compliance' },
+        { icon: <Route size={20} />, labelEn: 'MVU Fleet Tracking', labelHi: 'MVU Fleet Tracking', labelOd: 'MVU Fleet Tracking', path: 'mvu-fleet' },
+        { icon: <Users size={20} />, labelEn: 'Manpower', labelHi: 'Manpower', labelOd: 'Manpower', path: 'mvu-manpower' },
+        { icon: <BarChart3 size={20} />, labelEn: 'Targets', labelHi: 'Targets', labelOd: 'Targets', path: 'mvu-targets' },
+      ],
+    },
     { icon: <Truck size={20} />, labelEn: 'CDVO MVU', labelHi: 'CDVO MVU', labelOd: 'CDVO MVU', path: 'cdvo-mvu' },
     { icon: <Route size={20} />, labelEn: 'BVO Tour Plan', labelHi: 'BVO Tour Plan', labelOd: 'BVO Tour Plan', path: 'bvo-mvu-plan' },
-    { icon: <Package size={20} />, labelEn: 'BVO MVU Inventory', labelHi: 'BVO MVU Inventory', labelOd: 'BVO MVU Inventory', path: 'bvo-mvu-inventory' },
-    { icon: <ClipboardList size={20} />, labelEn: 'Village Assignment', labelHi: 'Village Assignment', labelOd: 'Village Assignment', path: 'bvo-mvu-assignment' },
-    { icon: <Truck size={20} />, labelEn: 'MVU Team Home', labelHi: 'MVU Team Home', labelOd: 'MVU Team Home', path: 'mvu-team-home' },
-    { icon: <Camera size={20} />, labelEn: 'Village Visit Log', labelHi: 'Village Visit Log', labelOd: 'Village Visit Log', path: 'mvu-team-visit' },
-    { icon: <ClipboardList size={20} />, labelEn: 'Daily Service Form', labelHi: 'Daily Service Form', labelOd: 'Daily Service Form', path: 'mvu-team-daily' },
-    { icon: <Package size={20} />, labelEn: 'MVU Stock Update', labelHi: 'MVU Stock Update', labelOd: 'MVU Stock Update', path: 'mvu-team-stock' },
+    {
+      icon: <Package size={20} />,
+      labelEn: 'BVO MVU Inventory',
+      labelHi: 'BVO MVU Inventory',
+      labelOd: 'BVO MVU Inventory',
+      path: 'bvo-mvu-inventory',
+      children: [
+        { icon: <Package size={20} />, labelEn: 'Medicine Inventory', labelHi: 'Medicine Inventory', labelOd: 'Medicine Inventory', path: 'bvo-mvu-inventory' },
+        { icon: <ClipboardList size={20} />, labelEn: 'Assignments', labelHi: 'Assignments', labelOd: 'Assignments', path: 'bvo-mvu-assignment' },
+      ],
+    },
+    {
+      icon: <Truck size={20} />,
+      labelEn: 'MVU Team Home',
+      labelHi: 'MVU Team Home',
+      labelOd: 'MVU Team Home',
+      path: 'mvu-team-home',
+      children: [
+        { icon: <Camera size={20} />, labelEn: 'Visit Log', labelHi: 'Visit Log', labelOd: 'Visit Log', path: 'mvu-team-visit' },
+        { icon: <ClipboardList size={20} />, labelEn: 'Daily Form', labelHi: 'Daily Form', labelOd: 'Daily Form', path: 'mvu-team-daily' },
+        { icon: <Package size={20} />, labelEn: 'Stock Update', labelHi: 'Stock Update', labelOd: 'Stock Update', path: 'mvu-team-stock' },
+      ],
+    },
     { icon: <Users size={20} />, labelEn: 'Farmers', labelHi: 'किसान', labelOd: 'କୃଷକ', path: 'farmers' },
     { icon: <Beef size={20} />, labelEn: 'Livestock', labelHi: 'पशुधन', labelOd: 'ପଶୁଧନ', path: 'livestock' },
     { icon: <Syringe size={20} />, labelEn: 'Health & Vaccination', labelHi: 'स्वास्थ्य और टीकाकरण', labelOd: 'ସ୍ୱାସ୍ଥ୍ୟ ଏବଂ ଟିକାକରଣ', path: 'health' },
@@ -109,6 +174,19 @@ export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNa
     { icon: <BarChart3 size={20} />, labelEn: 'Reports & Analytics', labelHi: 'रिपोर्ट और विश्लेषण', labelOd: 'ରିପୋର୍ଟ ଏବଂ ବିଶ୍ଳେଷଣ', path: 'reports' },
     { icon: <Settings size={20} />, labelEn: 'Settings', labelHi: 'सेटिंग्स', labelOd: 'ସେଟିଂସ୍', path: 'settings' },
   ];
+
+  useEffect(() => {
+    const activeParent = navItems.find((item) => {
+      const visibleChildren = item.children?.filter((child) => allowedPaths.includes(child.path)) ?? [];
+      return visibleChildren.length > 0 && (
+        item.path === currentPage ||
+        visibleChildren.some((child) => child.path === currentPage)
+      );
+    });
+    if (activeParent) {
+      setExpandedSubmenus((prev) => (prev.includes(activeParent.path) ? prev : [...prev, activeParent.path]));
+    }
+  }, [currentPage, user?.role]);
 
   const handleNavClick = (path: string) => {
     setActiveItem(path);
@@ -163,27 +241,78 @@ export function Sidebar({ isCollapsed, onToggle, currentPage = 'dashboard', onNa
 
       {/* Navigation */}
       <nav className="p-4 space-y-1 overflow-y-auto h-[calc(100vh-100px)]">
-        {navItems.filter((item) => allowedPaths.includes(item.path)).map((item) => (
-          <button
-            key={item.path}
-            onClick={() => handleNavClick(item.path)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all button-press ${
-              activeItem === item.path
-                ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg'
-                : 'text-slate-700 hover:bg-white/50'
-            } ${isCollapsed ? 'justify-center' : ''}`}
-            title={isCollapsed ? getLabel(item) : ''}
-          >
-            <span className={activeItem === item.path ? 'scale-110' : ''}>
-              {item.icon}
-            </span>
-            {!isCollapsed && (
-              <span className={`text-sm font-medium ${language === 'od' ? 'font-odia' : ''}`}>
-                {getLabel(item)}
-              </span>
-            )}
-          </button>
-        ))}
+        {navItems.filter((item) => allowedPaths.includes(item.path)).map((item) => {
+          const hasChildren = item.children && item.children.length > 0;
+          const filteredChildren = hasChildren ? item.children.filter((child) => allowedPaths.includes(child.path)) : [];
+          const hasVisibleChildren = filteredChildren.length > 0;
+          const isExpanded = expandedSubmenus.includes(item.path);
+          const isChildActive = filteredChildren.some((child) => child.path === activeItem);
+          const isParentActive = activeItem === item.path || isChildActive;
+
+          return (
+            <div key={item.path}>
+              <button
+                onClick={() => {
+                  if (hasVisibleChildren) {
+                    if (isCollapsed) {
+                      handleNavClick(filteredChildren[0].path);
+                      return;
+                    }
+                    toggleSubmenu(item.path);
+                  } else {
+                    handleNavClick(item.path);
+                  }
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all button-press ${
+                  isParentActive
+                    ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg'
+                    : 'text-slate-700 hover:bg-white/50'
+                } ${isCollapsed ? 'justify-center' : ''}`}
+                title={isCollapsed ? getLabel(item) : ''}
+              >
+                <span className={isParentActive ? 'scale-110' : ''}>
+                  {item.icon}
+                </span>
+                {!isCollapsed && (
+                  <>
+                    <span className={`text-sm font-medium flex-1 text-left ${language === 'od' ? 'font-odia' : ''}`}>
+                      {getLabel(item)}
+                    </span>
+                    {hasVisibleChildren && (
+                      <ChevronDown
+                        size={16}
+                        className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                      />
+                    )}
+                  </>
+                )}
+              </button>
+              {hasVisibleChildren && isExpanded && !isCollapsed && (
+                <div className="pl-4 space-y-1 mt-1">
+                  {filteredChildren.map((child) => (
+                    <button
+                      key={child.path}
+                      onClick={() => handleNavClick(child.path)}
+                      className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all text-sm button-press ${
+                        activeItem === child.path
+                          ? 'bg-green-100 text-green-700 font-medium'
+                          : 'text-slate-600 hover:bg-white/30'
+                      }`}
+                      title={getLabel(child)}
+                    >
+                      <span className={activeItem === child.path ? 'scale-105' : ''}>
+                        {child.icon}
+                      </span>
+                      <span className={language === 'od' ? 'font-odia' : ''}>
+                        {getLabel(child)}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </nav>
     </aside>
   );
